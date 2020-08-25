@@ -1,0 +1,20 @@
+
+
+
+
+-VZHLED:
+Vycházet z demo aplikace
+
+-FONT:
+Font - Droid Sans mono
+3 velikosti: malý text 25 px / line height 40 px
+nadpis h2: 45 px / 70 px
+nadpis h1 (např detaily osob, míst): 60 px / 90 px
+
+
+
+
+-LINKY:
+Mutable data - update - https://stackoverflow.com/questions/53304347/mutablelivedata-cannot-invoke-setvalue-on-a-background-thread-from-coroutine
+Endless recycler view - https://github.com/DevExchanges/EndlessRecyclerView/blob/master/app/src/main/java/info/devexchanges/endlessrecyclerview/MainActivity.java
+GMaps - cluster mngr - https://stackoverflow.com/questions/32727453/how-update-markers-on-map-when-using-clustermanager
