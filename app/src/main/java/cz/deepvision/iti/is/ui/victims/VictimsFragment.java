@@ -23,13 +23,11 @@ import java.util.List;
 
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
-import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.models.victims.VictimListItem;
-import io.realm.Realm;
 
-public class DashboardFragment extends Fragment {
+public class VictimsFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
+    private VictimsViewModel victimsViewModel;
     //private Realm realm;
     private RecyclerView recyclerView;
     private VictimsAdapter adapter;
@@ -38,18 +36,18 @@ public class DashboardFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                ViewModelProviders.of(this).get(DashboardViewModel.class);
+        victimsViewModel =
+                ViewModelProviders.of(this).get(VictimsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_victims, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        victimsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
         });
 
-        dashboardViewModel.getItems().observe(getViewLifecycleOwner(), new Observer<List<VictimListItem>>() {
+        victimsViewModel.getItems().observe(getViewLifecycleOwner(), new Observer<List<VictimListItem>>() {
             @Override
             public void onChanged(List<VictimListItem> victimListItems) {
                 Log.d("IS", "Items changed");
@@ -77,7 +75,7 @@ public class DashboardFragment extends Fragment {
                             adapter.notifyItemRemoved(itemList.size());
 
                             //LOAD DATA
-                            dashboardViewModel.loadData();
+                            victimsViewModel.loadData();
                             adapter.notifyDataSetChanged();
                             adapter.setLoaded();
                         }

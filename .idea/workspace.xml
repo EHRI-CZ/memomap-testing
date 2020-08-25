@@ -42,7 +42,7 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App">
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="app" />
       <option name="DEPLOY" value="true" />
       <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
@@ -106,5 +106,11 @@
       <updated>1598341487040</updated>
     </task>
     <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="523" y="25" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1598343269816">
+      <screen x="0" y="25" width="1920" height="997" />
+    </state>
+    <state x="523" y="25" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.25.1920.997/1920.0.1920.1080@0.25.1920.997" timestamp="1598343269816" />
   </component>
 </project>

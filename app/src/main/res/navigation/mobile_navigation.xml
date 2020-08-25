@@ -13,13 +13,13 @@
 
     <fragment
         android:id="@+id/navigation_victims"
-        android:name="cz.deepvision.iti.is.ui.victims.DashboardFragment"
+        android:name="cz.deepvision.iti.is.ui.victims.VictimsFragment"
         android:label="@string/title_victims"
         tools:layout="@layout/fragment_victims" />
 
     <fragment
         android:id="@+id/navigation_places"
-        android:name="cz.deepvision.iti.is.ui.places.NotificationsFragment"
+        android:name="cz.deepvision.iti.is.ui.places.PlacesFragment"
         android:label="@string/title_places"
         tools:layout="@layout/fragment_notifications" />
 

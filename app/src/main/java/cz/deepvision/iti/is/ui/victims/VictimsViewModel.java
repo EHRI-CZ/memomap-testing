@@ -20,13 +20,13 @@ import java.util.List;
 import cz.deepvision.iti.is.graphql.EntitiesGeoListLimitedQuery;
 import cz.deepvision.iti.is.models.victims.VictimListItem;
 
-public class DashboardViewModel extends ViewModel {
+public class VictimsViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
     private MutableLiveData<List<VictimListItem>> mItems;
     private int mOffset;
 
-    public DashboardViewModel() {
+    public VictimsViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is victims fragment");
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2196F3"
-    tools:context=".ui.victims.DashboardFragment">
+    tools:context=".ui.victims.VictimsFragment">
 
     <TextView
         android:id="@+id/text_dashboard"
