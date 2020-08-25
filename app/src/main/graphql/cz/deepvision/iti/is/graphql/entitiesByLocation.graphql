@@ -1,0 +1,6 @@
+query entitiesGeoLocation($lon: Float!, $lat: Float!, $radius: Int!){
+    entitiesGeoLocation(lon: $lon, lat: $lat, meters: $radius) {
+        entity_label
+        location{lat,lon}
+    }
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="years">
+        <item>"1939"</item>
+        <item>"1940"</item>
+        <item>"1941"</item>
+        <item>"1942"</item>
+        <item>"1943"</item>
+        <item>"1944"</item>
+        <item>"1945"</item>
+    </array>
+</resources>

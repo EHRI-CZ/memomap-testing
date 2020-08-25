@@ -1,0 +1,9 @@
+query placesGeolocation($lon: Float!, $lat: Float!, $radius: Int!){
+    placesGeolocation(lon: $lon, lat: $lat, meters: $radius) {
+        id,
+        idno,
+        place_type,
+        preferred_labels{cs},
+        location{lat,lon}
+    }
+}

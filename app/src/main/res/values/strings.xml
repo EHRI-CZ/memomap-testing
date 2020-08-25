@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ITI - Integrace&amp;Segregace</string>
+    <string name="title_home">Map</string>
+    <string name="title_victims">Victims</string>
+    <string name="title_places">Places</string>
+    <string name="title_events">Events</string>
+    <string name="title_about">About</string>
+</resources>
