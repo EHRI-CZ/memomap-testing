@@ -1,8 +1,9 @@
 query entitiesGeoListLimited($lon: Float!, $lat: Float!, $radius: Int!,$offset: Int!,$limit: Int!){
     entitiesGeoListLimited(lon: $lon, lat: $lat, meters: $radius, offset: $offset, limit: $limit) {
         entity_label
+        id
         location{lat,lon}
-        doc
-        doc_ch
+       full
+        preview
     }
 }

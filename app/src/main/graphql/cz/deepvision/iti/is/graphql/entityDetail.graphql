@@ -1,0 +1,26 @@
+query entityDetail($id : String!){
+    entityDetail(id: $id){
+        preview
+        full
+        firstname
+        surname
+        fate
+        sex
+        location{
+            lat
+            lon
+        }
+        events{
+            type
+            date
+            name
+            place
+            transport_nr
+        }
+        documents{
+            full
+            name
+            preview
+        }
+    }
+}

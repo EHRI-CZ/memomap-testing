@@ -34,7 +34,7 @@ public class RealmVictimsRecyclerViewAdapter extends RealmRecyclerViewAdapter<Pe
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.victims_list_item, parent, false);
         return new MyViewHolder(itemView);
     }
 
@@ -42,7 +42,7 @@ public class RealmVictimsRecyclerViewAdapter extends RealmRecyclerViewAdapter<Pe
     public void onBindViewHolder(MyViewHolder holder, int position) {
         final Person obj = getItem(position);
         holder.data = obj;
-        final long itemId = obj.getId();
+//        final long itemId = obj.getId();
         //noinspection ConstantConditions
         holder.title.setText(obj.getName());
     }
@@ -50,7 +50,8 @@ public class RealmVictimsRecyclerViewAdapter extends RealmRecyclerViewAdapter<Pe
     @Override
     public long getItemId(int index) {
         //noinspection ConstantConditions
-        return getItem(index).getId();
+//        return getItem(index).getId();
+        return 0;
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {

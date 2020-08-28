@@ -1,0 +1,18 @@
+query eventDetail($id : String!){
+    eventDetail(id: $id){
+        entity
+        entity_id
+        label
+        place
+        date
+        location{
+            lat
+            lon
+        }
+        documents{
+            full
+            name
+            preview
+        }
+    }
+}

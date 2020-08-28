@@ -1,0 +1,13 @@
+query placesGeoLocationGroup($lon: Float!, $lat: Float!, $radius: Int!){
+    placesGeoLocationGroup(lon: $lon, lat: $lat, meters: $radius){
+        places{
+            id
+            label
+        }
+        groupCount
+        location{
+            lat
+            lon
+        }
+    }
+}

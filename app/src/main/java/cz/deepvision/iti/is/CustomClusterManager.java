@@ -11,10 +11,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.ApolloClient;
-import com.apollographql.apollo.api.Response;
-import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -22,24 +18,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-import org.jetbrains.annotations.NotNull;
+import cz.deepvision.iti.is.models.markers.CustomMarker;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupQuery;
-import cz.deepvision.iti.is.models.MarkerItem;
 
 public class CustomClusterManager<M> extends ClusterManager {
     private GoogleMap map;
     private onCameraIdleExtension mOnCameraIdleExtension;
+    private Context ctx;
     public CustomClusterManager(Context context, GoogleMap map) {
         super(context, map);
+        ctx = context;
         this.map = map;
         this.setRenderer(new CustomRenderer(context,map,this));
     }
@@ -100,7 +91,7 @@ public class CustomClusterManager<M> extends ClusterManager {
 
 
 
-    private class CustomRenderer extends DefaultClusterRenderer<MarkerItem>{
+    private class CustomRenderer extends DefaultClusterRenderer<CustomMarker> {
         Context cnt;
         public CustomRenderer(Context context, GoogleMap map, ClusterManager clusterManager) {
             super(context, map, clusterManager);
@@ -108,13 +99,13 @@ public class CustomClusterManager<M> extends ClusterManager {
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(@NonNull MarkerItem item, @NonNull MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(@NonNull CustomMarker item, @NonNull MarkerOptions markerOptions) {
             super.onBeforeClusterItemRendered(item, markerOptions);
             markerOptions.icon(bitmapDescriptorFromVector(cnt,item.icon));
         }
 
         @Override
-        protected void onClusterItemUpdated(@NonNull MarkerItem item, @NonNull Marker marker) {
+        protected void onClusterItemUpdated(@NonNull CustomMarker item, @NonNull Marker marker) {
             super.onClusterItemUpdated(item, marker);
             try {
                 marker.setIcon(bitmapDescriptorFromVector(cnt,item.icon));

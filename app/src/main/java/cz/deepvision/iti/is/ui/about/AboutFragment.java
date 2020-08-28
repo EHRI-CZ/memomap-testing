@@ -13,7 +13,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import cz.deepvision.iti.is.R;
-import cz.deepvision.iti.is.ui.events.EventsViewModel;
 
 public class AboutFragment extends Fragment {
 

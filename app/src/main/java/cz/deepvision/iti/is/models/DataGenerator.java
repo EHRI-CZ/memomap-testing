@@ -15,7 +15,7 @@ public class DataGenerator {
             realm.beginTransaction();
 
             Person person = realm.createObject(Person.class);
-            person.setId(i);
+//            person.setId(i);
             person.setName("Some name "+i);
             person.setBorn(i+".03.1920");
             person.setFate("Murdered");

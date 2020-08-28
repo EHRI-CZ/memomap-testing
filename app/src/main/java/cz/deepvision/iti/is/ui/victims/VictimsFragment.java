@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,7 +23,7 @@ import java.util.List;
 
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
-import cz.deepvision.iti.is.models.victims.VictimListItem;
+import cz.deepvision.iti.is.models.victims.RecordListItem;
 
 public class VictimsFragment extends Fragment {
 
@@ -31,7 +31,7 @@ public class VictimsFragment extends Fragment {
     //private Realm realm;
     private RecyclerView recyclerView;
     private VictimsAdapter adapter;
-    private List<VictimListItem> itemList;
+    private List<RecordListItem> itemList;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -47,9 +47,18 @@ public class VictimsFragment extends Fragment {
             }
         });
 
-        victimsViewModel.getItems().observe(getViewLifecycleOwner(), new Observer<List<VictimListItem>>() {
+        final Button button = root.findViewById(R.id.load_more_places);
+        button.setVisibility(View.GONE);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(List<VictimListItem> victimListItems) {
+            public void onClick(View view) {
+
+            }
+        });
+
+        victimsViewModel.getItems().observe(getViewLifecycleOwner(), new Observer<List<RecordListItem>>() {
+            @Override
+            public void onChanged(List<RecordListItem> victimListItems) {
                 Log.d("IS", "Items changed");
                 itemList.addAll(victimListItems);
                 adapter.notifyDataSetChanged();
@@ -57,10 +66,10 @@ public class VictimsFragment extends Fragment {
             }
         });
         recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),1));
         //itemList = dashboardViewModel.loadData();
         itemList = new ArrayList<>();
-        adapter = new VictimsAdapter(recyclerView,itemList,getActivity());
+        adapter = new VictimsAdapter(recyclerView,itemList,getActivity(),this);
 
         adapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
@@ -73,7 +82,6 @@ public class VictimsFragment extends Fragment {
                         public void run() {
                             itemList.remove(itemList.size() - 1);
                             adapter.notifyItemRemoved(itemList.size());
-
                             //LOAD DATA
                             victimsViewModel.loadData();
                             adapter.notifyDataSetChanged();
@@ -81,8 +89,15 @@ public class VictimsFragment extends Fragment {
                         }
                     }, 5000);
                 } else {
+                    button.setVisibility(View.VISIBLE);
                     Toast.makeText(getActivity(), "Loading data completed", Toast.LENGTH_SHORT).show();
                 }
+                button.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void hideButton() {
+                button.setVisibility(View.GONE);
             }
         });
         return root;
@@ -96,8 +111,8 @@ public class VictimsFragment extends Fragment {
         //recyclerView.setAdapter(new RealmVictimsRecyclerViewAdapter(realm.where(Person.class).findAllAsync()));
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.HORIZONTAL));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+//        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.HORIZONTAL));
+//        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
     }
 
     @Override

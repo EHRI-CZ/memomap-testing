@@ -1,7 +1,10 @@
 query entitiesGeoLocationGroup($lon: Float!, $lat: Float!, $radius: Int!){
     entitiesGeoLocationGroup(lon: $lon, lat: $lat, meters: $radius) {
-        entity_label
         location{lat,lon},
         groupCount
+        entities{
+            id
+            label
+        }
     }
 }

@@ -1,0 +1,10 @@
+query eventsGeoLocationGroup($lon: Float!, $lat: Float!, $radius: Int!){
+    eventsGeoLocationGroup(lon: $lon, lat: $lat, meters: $radius){
+        events{
+            id
+            label
+        }
+        location{lat,lon},
+        groupCount
+    }
+}

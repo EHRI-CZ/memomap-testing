@@ -1,0 +1,17 @@
+query placeDetail($id : String!){
+    placeDetail(id: $id){
+        label
+        description
+        preview
+        full
+        location{
+            lat
+            lon
+        }
+        documents{
+            full
+            name
+            preview
+        }
+    }
+}

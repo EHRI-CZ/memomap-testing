@@ -1,0 +1,8 @@
+query placesGeoListLimited($lon: Float!, $lat: Float!, $radius: Int!,$offset: Int!,$limit: Int!){
+    placesGeoListLimited(lon: $lon, lat: $lat, meters: $radius, offset: $offset, limit: $limit) {
+        id
+        place_label
+        location{lat,lon}
+        preview
+    }
+}
