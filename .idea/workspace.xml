@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="ca004919-6bd5-492f-b5a3-d52320f40f02" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,9 +24,25 @@
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
-        <projects_view />
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
       </state>
     </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="valueResourceFile" />
+        <option value="resourceFile" />
+        <option value="Class" />
+        <option value="layoutResourceFile" />
+        <option value="GraphQL File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -30,9 +54,37 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DEBUGGABLE_DEVICE" value="hmd_global-nokia_3_1-ES2BC80627014554" />
+    <property name="DEBUGGABLE_PROCESS" value="cz.deepvision.iti.is" />
+    <property name="DEBUGGER_ID" value="Auto" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="TN04P8AK40004" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-08-27T09:09:51.737Z" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="SHOW_ALL_PROCESSES" value="false" />
+    <property name="extract.method.default.visibility" value="private" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/layout" />
     <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Projekty\Iti\app\src\main\res\font" />
+      <recent name="D:\Projekty\Iti\app\src\main\res\drawable" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Projekty\Iti\app\src\main\res\layout" />
+      <recent name="D:\Projekty\Iti\app\src\main\res\font" />
+      <recent name="D:\Projekty\Iti\app\src\main\res\anim" />
+      <recent name="D:\Projekty\Iti\app\src\main\res\values" />
+      <recent name="D:\Projekty\Iti\app\src\main\res\drawable" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="cz.deepvision.iti.is.models" />
+    </key>
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="cz.deepvision.iti.is.models" />
+      <recent name="cz.deepvision.iti.is.ui.dialog" />
+      <recent name="cz.deepvision.iti.is.ui" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
@@ -108,9 +160,268 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
+    <state x="2599" y="-20" key="#app" timestamp="1598347330323">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2599" y="-20" key="#app/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598347330323" />
+    <state x="2685" y="51" width="890" height="581" key="#com.intellij.ide.util.MemberChooser" timestamp="1598614523478">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2685" y="51" width="890" height="581" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598614523478" />
+    <state x="2610" y="118" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1598537979825">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2610" y="118" key="#com.intellij.ide.util.PackageChooserDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598537979825" />
     <state x="523" y="25" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1598343269816">
       <screen x="0" y="25" width="1920" height="997" />
     </state>
     <state x="523" y="25" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.25.1920.997/1920.0.1920.1080@0.25.1920.997" timestamp="1598343269816" />
+    <state x="2610" y="89" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598601835345">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2610" y="89" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598601835345" />
+    <state x="2610" y="89" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog" timestamp="1598454100555">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2610" y="89" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598454100555" />
+    <state x="2635" y="68" key="#xdebugger.evaluate" timestamp="1598602756270">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2635" y="68" key="#xdebugger.evaluate/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598602756270" />
+    <state x="2460" y="97" key="AndroidCreateResourceDirectoryDialog" timestamp="1598545373434">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2460" y="97" key="AndroidCreateResourceDirectoryDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598545373434" />
+    <state x="2460" y="97" key="AndroidCreateResourceFileDialog" timestamp="1598601880234">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2460" y="97" key="AndroidCreateResourceFileDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598601880234" />
+    <state x="2735" y="107" width="290" height="467" key="AndroidProcessChooserDialog" timestamp="1598620740262">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2735" y="107" width="290" height="467" key="AndroidProcessChooserDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620740262" />
+    <state x="2012" y="-86" width="1736" height="856" key="DiffContextDialog" timestamp="1598457179779">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2012" y="-86" width="1736" height="856" key="DiffContextDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598457179779" />
+    <state x="2560" y="97" key="Downloadable.Font.Dialog.Size" timestamp="1598545644452">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2560" y="97" key="Downloadable.Font.Dialog.Size/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598545644452" />
+    <state x="2660" y="97" key="FileChooserDialogImpl" timestamp="1598621001595">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2660" y="97" key="FileChooserDialogImpl/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598621001595" />
+    <state width="1876" height="530" key="GridCell.Tab.0.bottom" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.0.bottom/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state width="1540" height="658" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1598600509933" />
+    <state width="1876" height="530" key="GridCell.Tab.0.center" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.0.center/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state width="1540" height="658" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1598600509931" />
+    <state width="1876" height="530" key="GridCell.Tab.0.left" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.0.left/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state width="1540" height="658" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1598600509930" />
+    <state width="1876" height="530" key="GridCell.Tab.0.right" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.0.right/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state width="1540" height="658" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1598600509932" />
+    <state width="1876" height="530" key="GridCell.Tab.1.bottom" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.1.bottom/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state width="1876" height="530" key="GridCell.Tab.1.center" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.1.center/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state width="1876" height="530" key="GridCell.Tab.1.left" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.1.left/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state width="1876" height="530" key="GridCell.Tab.1.right" timestamp="1598620774773">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="1876" height="530" key="GridCell.Tab.1.right/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620774773" />
+    <state x="2695" y="276" key="ReplaceDuplicatesPrompt" timestamp="1598354673701">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2695" y="276" key="ReplaceDuplicatesPrompt/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598354673701" />
+    <state width="960" height="540" key="XDebugger.FullValuePopup" timestamp="1598602755437">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state width="960" height="540" key="XDebugger.FullValuePopup/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598602755437" />
+    <state x="2286" y="90" key="caller.chooser.dialog" timestamp="1598529421566">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2286" y="90" key="caller.chooser.dialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598529421566" />
+    <state x="94" y="-14" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1598619153311">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="94" y="-14" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598619153311" />
+    <state x="2689" y="259" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1598606441283">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2689" y="259" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598606441283" />
+    <state x="2651" y="45" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1598529308044">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2651" y="45" key="com.intellij.testIntegration.createTest.CreateTestDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598529308044" />
+    <state x="2433" y="78" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1598530945213">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2433" y="78" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598530945213" />
+    <state x="26" y="-21" width="1272" height="239" maximized="true" key="dock-window-1" timestamp="1598604837658">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="26" y="-21" width="1272" height="239" maximized="true" key="dock-window-1/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598604837658" />
+    <state x="-5" y="1" width="1546" height="868" key="dock-window-1/0.0.1536.824@0.0.1536.824" timestamp="1598598248061" />
+    <state x="2433" y="-196" width="1389" height="776" key="dock-window-2" timestamp="1598532235919">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2433" y="-196" width="1389" height="776" key="dock-window-2/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598532235919" />
+    <state x="0" y="0" width="1550" height="880" key="dock-window-3" timestamp="1598531901387">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="0" y="0" width="1550" height="880" key="dock-window-3/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598531901387" />
+    <state x="2610" y="111" width="540" height="468" key="extract.method.dialog" timestamp="1598460828802">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2610" y="111" width="540" height="468" key="extract.method.dialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598460828802" />
+    <state x="2575" y="74" width="627" height="536" key="find.popup" timestamp="1598620483063">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2575" y="74" width="627" height="536" key="find.popup/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620483063" />
+    <state x="524" y="200" width="611" height="536" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1598599804918" />
+    <state x="-1254" y="-30" key="refactoring.ChangeSignatureDialog" timestamp="1598528433500">
+      <screen x="-1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="-1254" y="-30" key="refactoring.ChangeSignatureDialog/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598528433500" />
+    <state x="2536" y="151" key="run.anything.popup" timestamp="1598543118733">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2536" y="151" key="run.anything.popup/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598543118733" />
+    <state x="2543" y="47" width="672" height="678" key="search.everywhere.popup" timestamp="1598620816772">
+      <screen x="1920" y="-178" width="1920" height="1040" />
+    </state>
+    <state x="2543" y="47" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/1920.-178.1920.1040/-1920.-178.1920.1040@1920.-178.1920.1040" timestamp="1598620816772" />
+    <state x="498" y="178" width="672" height="538" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1598600137933" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/events/EventsFragment.java</url>
+          <line>29</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/CustomClusterManager.java</url>
+          <line>108</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/victims/VictimsAdapter.java</url>
+          <line>112</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/DefaultDialog.java</url>
+          <line>202</line>
+          <option name="timeStamp" value="105" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/EventDialog.java</url>
+          <line>52</line>
+          <option name="timeStamp" value="106" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/EventDialog.java</url>
+          <line>51</line>
+          <option name="timeStamp" value="108" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/VictimDialog.java</url>
+          <line>94</line>
+          <option name="timeStamp" value="120" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/DefaultDialog.java</url>
+          <line>140</line>
+          <option name="timeStamp" value="122" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/home/HomeFragment.java</url>
+          <line>137</line>
+          <option name="timeStamp" value="124" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/DefaultDialog.java</url>
+          <line>159</line>
+          <option name="timeStamp" value="125" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/places/PlacesViewModel.java</url>
+          <line>55</line>
+          <option name="timeStamp" value="126" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/DefaultDialog.java</url>
+          <line>132</line>
+          <option name="timeStamp" value="127" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/dialog/DefaultDialog.java</url>
+          <line>121</line>
+          <option name="timeStamp" value="128" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-field">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/models/Place.java</url>
+          <line>15</line>
+          <properties field="documentList" class="cz.deepvision.iti.is.models.Place" />
+          <option name="timeStamp" value="83" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-field">
+          <url>file://$PROJECT_DIR$/app/src/main/java/cz/deepvision/iti/is/ui/home/HomeFragment.java</url>
+          <line>47</line>
+          <properties field="homeViewModel" class="cz.deepvision.iti.is.ui.home.HomeFragment" />
+          <option name="timeStamp" value="119" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="app">
+        <watch expression="ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &amp;&amp; ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED" language="JAVA" />
+        <watch expression="ActivityCompat.che" language="JAVA" />
+        <watch expression="entity.entity_label" language="JAVA" />
+        <watch expression="container.getChildCount()" language="JAVA" />
+        <watch expression="container.getChildCount()" language="JAVA" />
+        <watch expression="((ConstraintLayout) root).getChildCount()" language="JAVA" />
+        <watch expression="selected.getmEntity().size()" language="JAVA" />
+        <watch expression="doc.getName()" language="JAVA" />
+        <watch expression="items" language="JAVA" />
+        <watch expression="data.getDocumentList()" language="JAVA" />
+      </configuration>
+      <configuration name="Remote">
+        <watch expression="icon.getDrawable()" language="JAVA" />
+        <watch expression="url" language="JAVA" />
+        <watch expression="recyclerView.getHeight()" language="JAVA" />
+        <watch expression="dx" language="JAVA" />
+        <watch expression="location.lat" language="JAVA" />
+        <watch expression="Uri.parse(&quot;google.navigation:q=&quot; + location.getLng() + &quot;,&quot; + location.getLat())" language="JAVA" />
+        <watch expression="location.getlo" language="JAVA" />
+        <watch expression="parse(&quot;google.navigation:q=&quot; + location.getLat() + &quot;,&quot; + location.getLng())" language="JAVA" />
+        <watch expression="Uri.parse(&quot;google.navigation:q=&quot; + location.getLat() + &quot;,&quot; + location.getLng())" language="JAVA" />
+        <watch expression="data.documents" language="JAVA" />
+        <watch expression="data.getDocumentList()" language="JAVA" />
+        <watch expression="fragment.getClass().getName()" language="JAVA" />
+        <watch expression="ctx" language="JAVA" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
