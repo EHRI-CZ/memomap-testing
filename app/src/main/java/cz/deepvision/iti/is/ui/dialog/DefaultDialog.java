@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,18 +39,20 @@ import cz.deepvision.iti.is.util.LayoutGenerator;
 import cz.deepvision.iti.is.util.Requester;
 
 public abstract class DefaultDialog extends DialogFragment implements Requester.UpdatePhoto {
-    private Context ctx;
-    private Dialog dialog;
-    private boolean smallDialog;
-    private ConstraintLayout root;
-    private TextView name;
-    private ImageView photo;
-    private ImageView firstIcon;
-    private ImageView secondIcon;
-    private ImageView thirdIcon;
-    private LinearLayout infoContainer;
-    private LinearLayout iconsContainer;
-    private RecyclerView documentContainer;
+    protected Context ctx;
+    protected Dialog dialog;
+    protected boolean smallDialog;
+    protected FrameLayout root;
+    protected TextView name;
+    protected ImageView photo;
+    protected ImageView firstIcon;
+    protected ImageView secondIcon;
+    protected ImageView thirdIcon;
+    protected LinearLayout infoContainer;
+    protected LinearLayout iconsContainer;
+    protected RecyclerView documentContainer;
+    protected boolean isImageFitToScreen = false;
+
     Fragment fragment;
 
     public DefaultDialog() {
@@ -75,10 +78,8 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
             int height;
-            if (smallDialog)
-                height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            else
-                height = ViewGroup.LayoutParams.MATCH_PARENT;
+            if (smallDialog) height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            else height = ViewGroup.LayoutParams.MATCH_PARENT;
 
             if (smallDialog) {
 
@@ -101,7 +102,7 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        root = (ConstraintLayout) view;
+        root = (FrameLayout) view;
         name = view.findViewById(R.id.txt_info);
         photo = view.findViewById(R.id.img_general);
         infoContainer = view.findViewById(R.id.info_container);
@@ -113,8 +114,12 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         thirdIcon = view.findViewById(R.id.img_close_info);
         thirdIcon.setOnClickListener(icon -> {
             dismiss();
+            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+
         });
+        setCancelable(false);
         firstIcon.setOnClickListener(view1 -> updateDataOnMap(null));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
         if (smallDialog) {
             getName().setTextSize(25);
@@ -128,11 +133,10 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
             }
         }
         if (!smallDialog) {
-            if (!fragment.getClass().getName().equals("cz.deepvision.iti.is.ui.home.HomeFragment")){
+            if (!fragment.getClass().getName().equals("cz.deepvision.iti.is.ui.home.HomeFragment")) {
                 getFirstIcon().setVisibility(View.VISIBLE);
-                getFirstIcon().setImageDrawable(getCtx().getDrawable(R.drawable.ic_iti_show_on_map));
-            }
-            else getFirstIcon().setVisibility(View.GONE);
+                getFirstIcon().setImageDrawable(getCtx().getDrawable(R.drawable.ic_iti_menu_map));
+            } else getFirstIcon().setVisibility(View.GONE);
         }
 
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
@@ -154,33 +158,26 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
 
     }
 
+    protected void hideUI(int visibility) {
+        name.setVisibility(visibility);
+        infoContainer.setVisibility(visibility);
+        iconsContainer.setVisibility(visibility);
+        documentContainer.setVisibility(visibility);
+
+    }
+
     protected void showDataOnMap(Location location) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(fragment.requireContext());
-        AlertDialog alertDialog = builder.create();
-      /*  if (location == null) {
-            builder.setTitle("Upozornění");
-            builder.setMessage("U záznamů není uvedná poslední lokace, nelze přesměrovat na google mapy");
-            builder.setPositiveButton("OK", (dialogInterface, i) -> {
-                alertDialog.dismiss();
-            });
-        } else {*/
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra("location", new double[]{location.getLat(), location.getLng()});
-    /*    }
-        alertDialog.show();*/
+        dialog.dismiss();
+        fragment.getActivity().getActionBar().show();
+        getCtx().sendBroadcast(intent);
     }
 
     protected void updateDataOnMap(Location location) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(fragment.requireContext());
-        AlertDialog alertDialog = builder.create();
-        if (location == null) {
-            builder.setTitle("Upozornění");
-            builder.setMessage("U záznamů není uvedná poslední lokace, nelze přesměrovat na google mapy");
-            builder.setPositiveButton("OK", (dialogInterface, i) -> {
-                alertDialog.dismiss();
-            });
-        } else {
+        fragment.getActivity().runOnUiThread(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(fragment.requireContext());
             builder.setTitle("Přesměrování");
             builder.setMessage("Chcete otevřít Google maps ?");
             builder.setPositiveButton("Ano", (dialogInterface, i) -> {
@@ -192,19 +189,11 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
                 }
             });
             builder.setNegativeButton("Ne", (dialogInterface, i) -> {
-                alertDialog.dismiss();
+                dialogInterface.dismiss();
             });
-        }
-        builder.setPositiveButton("Ano", (dialogInterface, i) -> {
-            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + location.getLat() + "," + location.getLng());
-            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            mapIntent.setPackage("com.google.android.apps.maps");
-            if (mapIntent.resolveActivity(ctx.getPackageManager()) != null) {
-                startActivity(mapIntent);
-            }
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         });
-
-        alertDialog.show();
     }
 
     @Override
@@ -214,7 +203,7 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         }
     }
 
-    public ConstraintLayout getRoot() {
+    public FrameLayout getRoot() {
         return root;
     }
 

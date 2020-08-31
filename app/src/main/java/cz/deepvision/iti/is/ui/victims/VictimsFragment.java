@@ -2,10 +2,13 @@ package cz.deepvision.iti.is.ui.victims;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,10 +37,8 @@ public class VictimsFragment extends Fragment {
     private List<RecordListItem> itemList;
 
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        victimsViewModel =
-                ViewModelProviders.of(this).get(VictimsViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        victimsViewModel = ViewModelProviders.of(this).get(VictimsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_victims, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
         victimsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -52,7 +53,26 @@ public class VictimsFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (itemList.size() <= 20) {
+                    itemList.add(null);
+                    adapter.notifyItemInserted(itemList.size() - 1);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            itemList.remove(itemList.size() - 1);
+                            adapter.notifyItemRemoved(itemList.size());
+                            //LOAD DATA
+                            victimsViewModel.loadData();
+                            adapter.notifyDataSetChanged();
+                            adapter.setLoaded();
+                        }
+                    }, 5000);
+                }else {
+                    victimsViewModel.loadData();
+                    button.setVisibility(View.GONE);
+                    adapter.notifyDataSetChanged();
 
+                }
             }
         });
 
@@ -63,13 +83,15 @@ public class VictimsFragment extends Fragment {
                 itemList.addAll(victimListItems);
                 adapter.notifyDataSetChanged();
                 adapter.setLoaded();
+                if(itemList.size() > 23)
+                Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),1));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
         //itemList = dashboardViewModel.loadData();
         itemList = new ArrayList<>();
-        adapter = new VictimsAdapter(recyclerView,itemList,getActivity(),this);
+        adapter = new VictimsAdapter(recyclerView, itemList, getActivity(), this);
 
         adapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
@@ -88,20 +110,32 @@ public class VictimsFragment extends Fragment {
                             adapter.setLoaded();
                         }
                     }, 5000);
-                } else {
-                    button.setVisibility(View.VISIBLE);
-                    Toast.makeText(getActivity(), "Loading data completed", Toast.LENGTH_SHORT).show();
                 }
-                button.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void hideButton() {
-                button.setVisibility(View.GONE);
+                startAnimation(container,View.GONE);
+            }
+
+            @Override
+            public void showButton() {
+                startAnimation(container,View.VISIBLE);
+            }
+
+            private void startAnimation(ViewGroup root,int visibility) {
+                AutoTransition transition = new AutoTransition();
+                transition.setDuration(200);
+                transition.setInterpolator(new AccelerateDecelerateInterpolator());
+                TransitionManager.beginDelayedTransition(root, transition);
+                button.setVisibility(visibility);
+
             }
         });
         return root;
     }
+
+
 
     @Override
     public void onStart() {

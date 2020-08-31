@@ -21,9 +21,9 @@
         android:layout_height="wrap_content"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        android:backgroundTint="@color/iti_orange"
-        android:textColor="@color/colorAccent"
         android:text="Zobrazit"
+        android:background="@color/iti_orange"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/txt_info"
         app:layout_constraintTop_toTopOf="parent" />

@@ -1,7 +1,6 @@
-package cz.deepvision.iti.is.ui.places;
+package cz.deepvision.iti.is.ui.events;
 
 import android.app.Activity;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,14 +26,16 @@ import java.util.List;
 
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
-import cz.deepvision.iti.is.graphql.PlaceDetailQuery;
-import cz.deepvision.iti.is.models.Place;
+import cz.deepvision.iti.is.graphql.EntityDetailQuery;
+import cz.deepvision.iti.is.graphql.EventDetailQuery;
+import cz.deepvision.iti.is.models.Event;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
-import cz.deepvision.iti.is.ui.dialog.PlaceDialog;
+import cz.deepvision.iti.is.ui.dialog.EventDialog;
+import cz.deepvision.iti.is.ui.dialog.VictimDialog;
 import cz.deepvision.iti.is.util.Requester;
 
-public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
     private OnLoadMoreListener onLoadMoreListener;
@@ -45,10 +46,10 @@ public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private int lastVisibleItem, totalItemCount;
     private Fragment fragment;
 
-    public PlacesAdapter(RecyclerView recyclerView, List<RecordListItem> items, Activity activity, PlacesFragment placesFragment) {
+    public EventsAdapter(RecyclerView recyclerView, List<RecordListItem> items, Activity activity, EventsFragment eventsFragment) {
         this.items = items;
         this.activity = activity;
-        fragment = placesFragment;
+        fragment = eventsFragment;
 
         final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -102,22 +103,22 @@ public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_ITEM) {
             View view = LayoutInflater.from(activity).inflate(R.layout.fragment_list_item, parent, false);
-            return new PlacesAdapter.ItemViewHolder(view);
+            return new ItemViewHolder(view);
         } else if (viewType == VIEW_TYPE_LOADING) {
             View view = LayoutInflater.from(activity).inflate(R.layout.item_loading, parent, false);
-            return new PlacesAdapter.LoadingViewHolder(view);
+            return new LoadingViewHolder(view);
         }
         return null;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof PlacesAdapter.ItemViewHolder) {
+        if (holder instanceof ItemViewHolder) {
             RecordListItem item = items.get(position);
-            PlacesAdapter.ItemViewHolder itemViewHolder = (PlacesAdapter.ItemViewHolder) holder;
-            itemViewHolder.setUpPlaceData(item.getKey(), item.getUrl(), item.getLabel());
-        } else if (holder instanceof PlacesAdapter.LoadingViewHolder) {
-            PlacesAdapter.LoadingViewHolder loadingViewHolder = (PlacesAdapter.LoadingViewHolder) holder;
+            ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
+            itemViewHolder.setUpPersonData(item.getKey(), item.getUrl(), item.getLabel());
+        } else if (holder instanceof LoadingViewHolder) {
+            LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
             loadingViewHolder.progressBar.setIndeterminate(true);
         }
     }
@@ -131,7 +132,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         ConstraintLayout card;
         TextView title;
         ImageView icon;
-        public Person data;
+        public Event data;
         private String url;
         private String key;
 
@@ -142,19 +143,17 @@ public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             card = view.findViewById(R.id.row_root_element);
             icon = view.findViewById(R.id.imageView);
             card.setOnClickListener(view1 -> {
-                PlaceDialog placeDialog = new PlaceDialog(fragment, false);
+                EventDialog eventDialog = new EventDialog(fragment, true);
                 ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-                apolloClient.query(new PlaceDetailQuery(key)).enqueue(new ApolloCall.Callback<PlaceDetailQuery.Data>() {
+                apolloClient.query(new EventDetailQuery(key)).enqueue(new ApolloCall.Callback<EventDetailQuery.Data>() {
                     @Override
-                    public void onResponse(@NotNull Response<PlaceDetailQuery.Data> response) {
-                        Looper.prepare();
-                        if (response.data() != null && response.data().placeDetail() != null) {
-                            PlaceDetailQuery.PlaceDetail responseData = response.data().placeDetail();
-                            Place data = new Place(responseData);
-                            fragment.getActivity().runOnUiThread(() -> placeDialog.updateData(data));
-                            placeDialog.show(fragment.getActivity().getSupportFragmentManager(), "dialog");
+                    public void onResponse(@NotNull Response<EventDetailQuery.Data> response) {
+                        if (response.data() != null && response.data().eventDetail() != null) {
+                            EventDetailQuery.EventDetail responseData = response.data().eventDetail();
+                            data = new Event(responseData);
+                            fragment.getActivity().runOnUiThread(() -> eventDialog.updateData(data));
+                            eventDialog.show(fragment.getChildFragmentManager(), "dialog_fullscreen");
                         }
-
                     }
 
                     @Override
@@ -162,10 +161,11 @@ public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                         Log.e("IS", e.getMessage());
                     }
                 });
+                //TODO : get query to show more detailed info
             });
         }
 
-        public void setUpPlaceData(String key, String url, String label) {
+        public void setUpPersonData(String key, String url, String label) {
             this.key = key;
             this.url = url;
             this.title.setText(label);

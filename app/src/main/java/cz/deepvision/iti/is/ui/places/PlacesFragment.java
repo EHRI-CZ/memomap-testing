@@ -2,10 +2,13 @@ package cz.deepvision.iti.is.ui.places;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +53,25 @@ public class PlacesFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (itemList.size() <= 20) {
+                    itemList.add(null);
+                    adapter.notifyItemInserted(itemList.size() - 1);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            itemList.remove(itemList.size() - 1);
+                            adapter.notifyItemRemoved(itemList.size());
+                            //LOAD DATA
+                            placesViewModel.loadData();
+                            adapter.notifyDataSetChanged();
+                            adapter.setLoaded();
+                        }
+                    }, 5000);
+                }else {
+                    placesViewModel.loadData();
+                    adapter.notifyDataSetChanged();
+                    button.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -95,7 +116,21 @@ public class PlacesFragment extends Fragment {
 
             @Override
             public void hideButton() {
-                button.setVisibility(View.GONE);
+                startAnimation(container,View.GONE);
+            }
+
+            @Override
+            public void showButton() {
+                startAnimation(container,View.VISIBLE);
+            }
+
+            private void startAnimation(ViewGroup root,int visibility) {
+                AutoTransition transition = new AutoTransition();
+                transition.setDuration(200);
+                transition.setInterpolator(new AccelerateDecelerateInterpolator());
+                TransitionManager.beginDelayedTransition(root, transition);
+                button.setVisibility(visibility);
+
             }
         });
         return root;

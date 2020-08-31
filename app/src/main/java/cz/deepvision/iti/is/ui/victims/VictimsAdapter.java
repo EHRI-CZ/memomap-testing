@@ -32,7 +32,7 @@ import cz.deepvision.iti.is.models.victims.RecordListItem;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
 import cz.deepvision.iti.is.util.Requester;
 
-public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
     private OnLoadMoreListener onLoadMoreListener;
@@ -62,15 +62,20 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                 totalItemCount = gridLayoutManager.getItemCount();
                 lastVisibleItem = gridLayoutManager.findLastVisibleItemPosition();
-                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+              /*  if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.onLoadMore();
                     }
                     isLoading = true;
-                }
-                if(dy < 0) {
+                }*/
+                if(lastVisibleItem > totalItemCount-4){
                     if (onLoadMoreListener != null) {
-//                        onLoadMoreListener.hideButton();
+                        onLoadMoreListener.showButton();
+                    }
+                }
+                if (dy < 0) {
+                    if (onLoadMoreListener != null) {
+                        onLoadMoreListener.hideButton();
                     }
                 }
             }
@@ -94,7 +99,7 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_ITEM) {
-            View view = LayoutInflater.from(activity).inflate(R.layout.victims_list_item, parent, false);
+            View view = LayoutInflater.from(activity).inflate(R.layout.fragment_list_item, parent, false);
             return new ItemViewHolder(view);
         } else if (viewType == VIEW_TYPE_LOADING) {
             View view = LayoutInflater.from(activity).inflate(R.layout.item_loading, parent, false);
@@ -143,10 +148,8 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         if (response.data() != null && response.data().entityDetail() != null) {
                             EntityDetailQuery.EntityDetail responseData = response.data().entityDetail();
                             data = new Person(responseData);
+                            fragment.getActivity().runOnUiThread(() -> victimDialog.updateData(data));
                             victimDialog.show(fragment.getChildFragmentManager(), "dialog_fullscreen");
-                            activity.runOnUiThread(() -> {
-                                victimDialog.updateData(data);
-                            });
                         }
                     }
 
@@ -165,9 +168,8 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             this.title.setText(label);
             if (url != null) {
                 Requester requester = new Requester(fragment.getActivity());
-                requester.makeRequestForAdapter(url,icon);
-            } else
-                icon.setImageDrawable(activity.getDrawable(R.drawable.no_portrait_icon));
+                requester.makeRequestForAdapter(url, icon);
+            } else icon.setImageDrawable(activity.getDrawable(R.drawable.no_portrait_icon));
 
         }
     }

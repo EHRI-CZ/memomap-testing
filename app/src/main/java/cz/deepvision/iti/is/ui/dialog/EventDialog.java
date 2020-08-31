@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Event;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
 
@@ -61,21 +62,30 @@ public class EventDialog extends DefaultDialog implements DefaultDialog.Updater<
                     getDocumentContainer().setHasFixedSize(true);
                     getDocumentContainer().setAdapter(documentAdapter);
                 } else getDocumentContainer().setVisibility(View.GONE);
-                getFirstIcon().setOnClickListener(v->{
-                    showDataOnMap(data.getLocation());
-                });
-            }
-            getSecondIcon().setOnClickListener(v->{
-                updateDataOnMap(data.getLocation());
-            });
+                getFirstIcon().setOnClickListener(v -> {
+                    if (data.getLocation() != null) showDataOnMap(data.getLocation());
 
+                });
+                if (data.getLocation() == null) {
+                    getFirstIcon().setEnabled(false);
+                    getFirstIcon().setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_menu_map_grayed));
+                }
+            }
+            getSecondIcon().setOnClickListener(v -> {
+                if (data.getLocation() != null) updateDataOnMap(data.getLocation());
+
+            });
+            if (data.getLocation() == null) {
+                getSecondIcon().setEnabled(false);
+                getSecondIcon().setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_navigate_grayed));
+            }
             getName().setText(data.getLabel());
             getPhoto().setVisibility(View.GONE);
         }
     }
+
     @Override
     public void updateData(Event data) {
         this.data = data;
-        updateUI();
     }
 }

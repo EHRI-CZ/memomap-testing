@@ -1,6 +1,7 @@
 package cz.deepvision.iti.is.ui.victims;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TooManyListenersException;
 
 import cz.deepvision.iti.is.graphql.EntitiesGeoListLimitedQuery;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
@@ -25,6 +27,7 @@ public class VictimsViewModel extends ViewModel {
     private MutableLiveData<String> mText;
     private MutableLiveData<List<RecordListItem>> mItems;
     private int mOffset;
+    private static int number = 1;
 
     public VictimsViewModel() {
         mText = new MutableLiveData<>();
@@ -47,7 +50,12 @@ public class VictimsViewModel extends ViewModel {
         ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
         LatLng location = new LatLng(50.088780, 14.419094);
         int radius = 150;
+        if(mOffset>0) radius = 150 * (mOffset/24);
+        if(mOffset ==0) {
+            number = 1;
+        }
         // TODO : Zobrazení vícero osob, data takhle přijdou, takže chyba buď GRAPHQL, nebo ITI
+        // TODO : Limit nefunguje s větším radiusem přijde záznamů více
         apolloClient.query(new EntitiesGeoListLimitedQuery(location.longitude,location.latitude,(int)radius,mOffset,24))
                 .enqueue(new ApolloCall.Callback<EntitiesGeoListLimitedQuery.Data>() {
                     @Override
@@ -55,10 +63,11 @@ public class VictimsViewModel extends ViewModel {
                         List<RecordListItem> items = new ArrayList<>();
                         for (EntitiesGeoListLimitedQuery.EntitiesGeoListLimited dbItem:response.data().entitiesGeoListLimited()) {
                             RecordListItem item = new RecordListItem();
-                            item.setLabel(dbItem.entity_label());
+                            item.setLabel(number + ":" +dbItem.entity_label());
                             item.setKey(dbItem.id());
                             item.setUrl(dbItem.preview());
                             items.add(item);
+                            number++;
                         }
                         mItems.postValue(items);
                         mOffset+=24;

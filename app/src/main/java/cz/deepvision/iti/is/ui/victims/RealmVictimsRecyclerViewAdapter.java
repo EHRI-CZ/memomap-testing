@@ -34,7 +34,7 @@ public class RealmVictimsRecyclerViewAdapter extends RealmRecyclerViewAdapter<Pe
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.victims_list_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_item, parent, false);
         return new MyViewHolder(itemView);
     }
 

@@ -26,10 +26,11 @@ public class PlacesViewModel extends ViewModel {
 
     private MutableLiveData<List<RecordListItem>> mItems;
     private int mOffset;
+    private static int number = 1;
 
     public PlacesViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is victims fragment");
+        mText.setValue("This is places fragment");
 
         mItems = new MutableLiveData<>();
         mOffset = 0;
@@ -48,6 +49,10 @@ public class PlacesViewModel extends ViewModel {
         ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
         LatLng location = new LatLng(50.089397, 14.416994);
         int radius = 150;
+        if(mOffset>0) radius = 150 * (mOffset/24);
+        if(mOffset ==0) {
+            number = 1;
+        }
         apolloClient.query(new PlacesGeoListLimitedQuery(location.longitude,location.latitude,(int)radius,mOffset,24))
                 .enqueue(new ApolloCall.Callback<PlacesGeoListLimitedQuery.Data>() {
                     @Override
@@ -55,10 +60,11 @@ public class PlacesViewModel extends ViewModel {
                         List<RecordListItem> items = new ArrayList<>();
                         for (PlacesGeoListLimitedQuery.PlacesGeoListLimited dbItem:response.data().placesGeoListLimited()) {
                             RecordListItem item = new RecordListItem();
-                            item.setLabel(dbItem.place_label());
+                            item.setLabel(number + ":" +dbItem.place_label());
                             item.setKey(dbItem.id());
                             item.setUrl(dbItem.preview());
                             items.add(item);
+                            number++;
                         }
                         mItems.postValue(items);
                         mOffset+=24;

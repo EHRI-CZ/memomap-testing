@@ -1,0 +1,7 @@
+query searchByFullText($text: String!){
+    fullText(text: $text){
+        id
+        label
+        type
+    }
+}

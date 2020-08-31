@@ -6,12 +6,15 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Place;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
 import cz.deepvision.iti.is.util.Requester;
@@ -73,26 +76,21 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
                 if (data.getFull() != null) imageUrl = data.getFull();
                 addInfo(getInfoContainer(), data.getDescription());
                 changeLayoutConstrains();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getActivity().runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            changeLayoutConstrains();
-
-                                                        }
-                                                    }
-                        );
-                    }
-                }, 5000);
                 getFirstIcon().setOnClickListener(v -> {
-                    showDataOnMap(data.getLocation());
+                    if (data.getLocation() != null) showDataOnMap(data.getLocation());
                 });
+                if (data.getLocation() == null) {
+                    getFirstIcon().setEnabled(false);
+                    getFirstIcon().setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_menu_map_grayed));
+                }
             }
             getSecondIcon().setOnClickListener(v -> {
-                updateDataOnMap(data.getLocation());
+                if (data.getLocation() != null) updateDataOnMap(data.getLocation());
             });
+            if (data.getLocation() == null) {
+                getSecondIcon().setEnabled(false);
+                getSecondIcon().setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_navigate_grayed));
+            }
 
             if (!imageUrl.equals("")) {
                 Requester requester = new Requester(getActivity(), this);
@@ -108,12 +106,15 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
         photoParams.leftToLeft = getRoot().getId();
         photoParams.leftMargin = 0;
         photoParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        photoParams.height = 350;
+        photoParams.height = 400;
         getPhoto().setLayoutParams(photoParams);
+
         ConstraintLayout.LayoutParams textParams = (ConstraintLayout.LayoutParams) getInfoContainer().getLayoutParams();
         textParams.leftToLeft = getRoot().getId();
         textParams.rightToRight = getRoot().getId();
         textParams.topToBottom = getPhoto().getId();
+        textParams.topToTop = -1;
+        textParams.topMargin = 8;
         textParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         textParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         getInfoContainer().setLayoutParams(textParams);
@@ -128,6 +129,5 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
     @Override
     public void updateData(Place data) {
         this.data = data;
-        updateUI();
     }
 }
