@@ -1,17 +1,16 @@
 package cz.deepvision.iti.is.models.markers;
 
 import com.google.android.gms.maps.model.LatLng;
+import cz.deepvision.iti.is.graphql.EventsGeoLocationGroupQuery;
 
 import java.util.List;
 
-import cz.deepvision.iti.is.graphql.EventsGeoLocationGroupQuery;
-
 public class EventMarker extends CustomMarker<EventsGeoLocationGroupQuery.Event>
-    {
-        private final LatLng mPosition;
-        private List<EventsGeoLocationGroupQuery.Event> mEvents;
-        private String mSnippet;
-        public final int icon;
+{
+    private final LatLng mPosition;
+    private List<EventsGeoLocationGroupQuery.Event> mEvents;
+    private String mSnippet;
+    public final int icon;
 
 //    public EventMarker(double lat, double lng, int iconRes) {
 //        super(lat,lng,iconRes);
@@ -30,43 +29,43 @@ public class EventMarker extends CustomMarker<EventsGeoLocationGroupQuery.Event>
         icon = iconRes;
     }
 
-        public List<EventsGeoLocationGroupQuery.Event> getmEvents() {
-            return mEvents;
-        }
+    public List<EventsGeoLocationGroupQuery.Event> getmEvents() {
+        return mEvents;
+    }
 
-        @Override
-        public LatLng getPosition() {
+    @Override
+    public LatLng getPosition() {
         return mPosition;
     }
 
-        @Override
-        public String getTitle() { return getWholeTitle(getmEvents()); }
+    @Override
+    public String getTitle() { return getWholeTitle(getmEvents()); }
 
-        private String getWholeTitle(List<EventsGeoLocationGroupQuery.Event> getmEvents) {
+    private String getWholeTitle(List<EventsGeoLocationGroupQuery.Event> getmEvents) {
         String title = "";
-            for (EventsGeoLocationGroupQuery.Event event : getmEvents) {
-                title += " ";
-                title += event.label();
-            }
-            return title;
+        for (EventsGeoLocationGroupQuery.Event event : getmEvents) {
+            title += " ";
+            title += event.label();
         }
+        return title;
+    }
 
-        @Override
-        public String getSnippet() { return mSnippet; }
+    @Override
+    public String getSnippet() { return mSnippet; }
 
-        /**
-         * Set the title of the marker
-         * @param mEvents Single person entity
-         */
-        public void setmEvents(List<EventsGeoLocationGroupQuery.Event> mEvents) {
-            this.mEvents = mEvents;
-        }
+    /**
+     * Set the title of the marker
+     * @param mEvents Single person entity
+     */
+    public void setmEvents(List<EventsGeoLocationGroupQuery.Event> mEvents) {
+        this.mEvents = mEvents;
+    }
 
-        /**
-         * Set the description of the marker
-         * @param snippet string to be set as snippet
-         */
-        public void setSnippet(String snippet) {
+    /**
+     * Set the description of the marker
+     * @param snippet string to be set as snippet
+     */
+    public void setSnippet(String snippet) {
         mSnippet = snippet;
     }
 

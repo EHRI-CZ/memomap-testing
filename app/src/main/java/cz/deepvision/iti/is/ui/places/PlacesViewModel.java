@@ -1,24 +1,20 @@
 package cz.deepvision.iti.is.ui.places;
 
 import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.maps.model.LatLng;
-
+import cz.deepvision.iti.is.graphql.PlacesGeoListLimitedQuery;
+import cz.deepvision.iti.is.models.victims.RecordListItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import cz.deepvision.iti.is.graphql.PlacesGeoListLimitedQuery;
-import cz.deepvision.iti.is.models.victims.RecordListItem;
 
 public class PlacesViewModel extends ViewModel {
 

@@ -4,39 +4,25 @@ import android.content.Context;
 import android.os.Bundle;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-
-import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.ApolloClient;
-import com.apollographql.apollo.api.Response;
-import com.apollographql.apollo.exception.ApolloException;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-
 import cz.deepvision.iti.is.R;
-import cz.deepvision.iti.is.graphql.EntityDetailQuery;
 import cz.deepvision.iti.is.models.victims.Event;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
 import cz.deepvision.iti.is.util.Requester;
 
-import static cz.deepvision.iti.is.util.LayoutGenerator.addInfo;
-import static cz.deepvision.iti.is.util.LayoutGenerator.filterEvents;
-import static cz.deepvision.iti.is.util.LayoutGenerator.getEndingChar;
-import static cz.deepvision.iti.is.util.LayoutGenerator.getTransports;
+import java.util.List;
+
+import static cz.deepvision.iti.is.util.LayoutGenerator.*;
 
 public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater<Person>, Requester.UpdatePhoto {
     private Person data;
@@ -103,7 +89,7 @@ public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater
                         getPhoto().setLayoutParams(new ConstraintLayout.LayoutParams(300, 300));
                         ConstraintLayout.LayoutParams photoParams = (ConstraintLayout.LayoutParams) getPhoto().getLayoutParams();
                         photoParams.topToBottom = getName().getId();
-                        photoParams.topMargin = 16;
+                        photoParams.topMargin = 64;
                         getPhoto().setLayoutParams(photoParams);
                     } else {
                         isImageFitToScreen = true;

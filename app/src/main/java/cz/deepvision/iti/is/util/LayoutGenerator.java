@@ -4,13 +4,12 @@ import android.content.Context;
 import android.os.Build;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import cz.deepvision.iti.is.models.victims.Event;
 import cz.deepvision.iti.is.models.victims.Person;
 import io.realm.RealmList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LayoutGenerator {
     private static Context ctx;

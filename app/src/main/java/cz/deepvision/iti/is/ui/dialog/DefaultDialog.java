@@ -8,31 +8,18 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.flexbox.AlignItems;
-import com.google.android.flexbox.FlexDirection;
-import com.google.android.flexbox.FlexWrap;
-import com.google.android.flexbox.FlexboxLayoutManager;
-import com.google.android.flexbox.JustifyContent;
-
+import com.google.android.flexbox.*;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Location;
 import cz.deepvision.iti.is.util.LayoutGenerator;
@@ -119,7 +106,7 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         });
         setCancelable(false);
         firstIcon.setOnClickListener(view1 -> updateDataOnMap(null));
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
         if (smallDialog) {
             getName().setTextSize(25);
@@ -129,14 +116,16 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         } else {
             getName().setTextSize(30);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                getName().setLineHeight(65);
+                getName().setLineHeight(100);
             }
         }
         if (!smallDialog) {
             if (!fragment.getClass().getName().equals("cz.deepvision.iti.is.ui.home.HomeFragment")) {
                 getFirstIcon().setVisibility(View.VISIBLE);
                 getFirstIcon().setImageDrawable(getCtx().getDrawable(R.drawable.ic_iti_menu_map));
-            } else getFirstIcon().setVisibility(View.GONE);
+            } else {
+                getFirstIcon().setVisibility(View.GONE);
+            }
         }
 
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
@@ -171,9 +160,28 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra("location", new double[]{location.getLat(), location.getLng()});
         dialog.dismiss();
-        fragment.getActivity().getActionBar().show();
+//        dismissAllDialogs(fragment.getActivity().getSupportFragmentManager());
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         getCtx().sendBroadcast(intent);
     }
+
+    /*private void dismissAllDialogs(FragmentManager manager) {
+        List<Fragment> fragments = manager.getFragments();
+
+        if (fragments == null)
+            return;
+
+        for (Fragment fragment : fragments) {
+            if (fragment instanceof DefaultDialog) {
+                DefaultDialog dialogFragment = (DefaultDialog) fragment;
+                dialogFragment.dismissAllowingStateLoss();
+            }
+
+            FragmentManager childFragmentManager = fragment.getChildFragmentManager();
+            if (childFragmentManager != null)
+                dismissAllDialogs(childFragmentManager);
+        }
+    }*/
 
     protected void updateDataOnMap(Location location) {
         fragment.getActivity().runOnUiThread(() -> {

@@ -1,10 +1,9 @@
 package cz.deepvision.iti.is.models.markers;
 
 import com.google.android.gms.maps.model.LatLng;
+import cz.deepvision.iti.is.graphql.PlacesGeoLocationGroupQuery.Place;
 
 import java.util.List;
-
-import cz.deepvision.iti.is.graphql.PlacesGeoLocationGroupQuery.Place;
 
 public class PlaceMarker extends CustomMarker<Place> {
 

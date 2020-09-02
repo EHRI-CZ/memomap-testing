@@ -8,22 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.graphql.EntityDetailQuery;
@@ -31,6 +24,9 @@ import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
 import cz.deepvision.iti.is.util.Requester;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
     public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;

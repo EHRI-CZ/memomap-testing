@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -22,7 +21,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
@@ -33,25 +31,14 @@ import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import cz.deepvision.iti.is.CustomClusterManager;
 import cz.deepvision.iti.is.R;
-import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupQuery;
-import cz.deepvision.iti.is.graphql.EntityDetailQuery;
-import cz.deepvision.iti.is.graphql.EventDetailQuery;
-import cz.deepvision.iti.is.graphql.EventsGeoLocationGroupQuery;
-import cz.deepvision.iti.is.graphql.PlaceDetailQuery;
-import cz.deepvision.iti.is.graphql.PlacesGeoLocationGroupQuery;
+import cz.deepvision.iti.is.graphql.*;
 import cz.deepvision.iti.is.models.Event;
 import cz.deepvision.iti.is.models.Place;
 import cz.deepvision.iti.is.models.markers.CustomMarker;
@@ -63,11 +50,14 @@ import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.dialog.EventDialog;
 import cz.deepvision.iti.is.ui.dialog.PlaceDialog;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeViewModel extends AndroidViewModel implements CustomClusterManager.onCameraIdleExtension, LocationListener {
 
     private MutableLiveData<String> mText;
-    private MutableLiveData<double[]> location;
     private CustomClusterManager<CustomMarker> mClusterManager;
 
     SupportMapFragment mapFragment = null;
@@ -79,11 +69,12 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
     private LocationManager mLocationManager = null;
     private List<CustomMarker> markerItems;
     private Boolean[] filters = new Boolean[]{true, true, true};
+    private boolean loading = false;
 
-    public HomeViewModel(@NonNull Application application) {
+    public HomeViewModel(@NonNull Application application, cz.deepvision.iti.is.models.Location position) {
         super(application);
         mText = new MutableLiveData<>();
-        location = new MutableLiveData<>();
+        cz.deepvision.iti.is.models.Location location = position;
         mText.setValue("This is home fragment");
         if (mapFragment == null) {
             GoogleMapOptions options = new GoogleMapOptions();
@@ -95,7 +86,7 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
             isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             mapFragment = SupportMapFragment.newInstance(options);
 
-            /*if (isGPSEnabled){
+           /* if (isGPSEnabled){
                 if (ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
                             0, this);
@@ -108,13 +99,14 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
         mapFragment.getMapAsync(googleMap -> {
             LatLng latLng = new LatLng(50.088780, 14.419094);
             lastPossition = latLng;
-//            googleMap.addMarker(new MarkerOptions().position(latLng).title("ITI"));
-            if (location.getValue() != null) {
-                latLng = new LatLng(location.getValue()[0], location.getValue()[1]);
+//            Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                latLng = new LatLng(location.getLat(), location.getLng());
                 lastPossition = latLng;
             }
             mMap = googleMap;
-            googleMap.addMarker(new MarkerOptions().position(latLng).title("ITI"));
+//            mMap.setOnInfoWindowCloseListener(Marker::remove);
+//            Marker iti = googleMap.addMarker(new MarkerOptions().position(latLng).title("ITI"));
             googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplication().getApplicationContext(), R.raw.map_style_dark));
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPossition, 18));
             //Cluster
@@ -122,7 +114,9 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
             mClusterManager.setmOnCameraIdleExtension(thisModel);
             mClusterManager.setOnClusterItemClickListener(onClusterClickListener);
             googleMap.setOnCameraIdleListener(mClusterManager);
-            updateMarkers(googleMap, latLng, getRadius(googleMap));
+            updateMarkers(googleMap, latLng, mClusterManager.getRadius(googleMap));
+
+
 /*mClusterManager.getMarkerCollection().setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 @Override
 public View getInfoWindow(Marker marker) {
@@ -196,7 +190,7 @@ Toast.LENGTH_SHORT).show());
 
                 List<ListViewItem> listViewItems = new ArrayList<>();
                 for (EventsGeoLocationGroupQuery.Event event : selected.getmEvents()) {
-                    listViewItems.add(new ListViewItem(event.id(),event.label(),"event"));
+                    listViewItems.add(new ListViewItem(event.id(), event.label(), "event"));
                 }
                 LisViewAdapter homePersonAdapter = new LisViewAdapter(listViewItems, getmFragment());
                 RecyclerView container = root.findViewById(R.id.person_list);
@@ -247,8 +241,8 @@ Toast.LENGTH_SHORT).show());
 
                 List<ListViewItem> listViewItems = new ArrayList<>();
                 for (EntitiesGeoLocationGroupQuery.Entity entity : selected.getmEntity()) {
-                    listViewItems.add(new ListViewItem(entity.id(),entity.label(),"entity"));
-                    
+                    listViewItems.add(new ListViewItem(entity.id(), entity.label(), "entity"));
+
                 }
                 LisViewAdapter homePersonAdapter = new LisViewAdapter(listViewItems, getmFragment());
                 RecyclerView container = root.findViewById(R.id.person_list);
@@ -315,47 +309,11 @@ Toast.LENGTH_SHORT).show());
         this.mFragment = mFragment;
     }
 
-    public MutableLiveData<double[]> getLocation() {
-        return location;
-    }
-
-    public float getRadius(GoogleMap googleMap) {
-        VisibleRegion visibleRegion = googleMap.getProjection().getVisibleRegion();
-
-        LatLng farRight = visibleRegion.farRight;
-        LatLng farLeft = visibleRegion.farLeft;
-        LatLng nearRight = visibleRegion.nearRight;
-        LatLng nearLeft = visibleRegion.nearLeft;
-
-        float[] distanceWidth = new float[2];
-        Location.distanceBetween((farRight.latitude + nearRight.latitude) / 2, (farRight.longitude + nearRight.longitude) / 2, (farLeft.latitude + nearLeft.latitude) / 2, (farLeft.longitude + nearLeft.longitude) / 2, distanceWidth);
-
-
-        float[] distanceHeight = new float[2];
-        Location.distanceBetween((farRight.latitude + nearRight.latitude) / 2, (farRight.longitude + nearRight.longitude) / 2, (farLeft.latitude + nearLeft.latitude) / 2, (farLeft.longitude + nearLeft.longitude) / 2, distanceHeight);
-
-        float distance;
-
-        if (distanceWidth[0] > distanceHeight[0]) {
-            distance = distanceWidth[0];
-        } else {
-            distance = distanceHeight[0];
-        }
-        return distance;
-    }
-
-    /*private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth() / 2, vectorDrawable.getIntrinsicHeight() / 2);
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth() / 2, vectorDrawable.getIntrinsicHeight() / 2, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }*/
 
     public void updateMarkers(final GoogleMap googleMap, LatLng location, float radius) {
         ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
         markerItems = new ArrayList<>();
+        Boolean[] doneLoading = new Boolean[]{false, false, false};
 
         if (filters[0]) {
             //Entities groups
@@ -363,20 +321,26 @@ Toast.LENGTH_SHORT).show());
                 @Override
                 public void onResponse(@NotNull Response<EntitiesGeoLocationGroupQuery.Data> response) {
                     final List<EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup> entities = response.data().entitiesGeoLocationGroup();
-                    //final BitmapDescriptor icon = bitmapDescriptorFromVector(mFragment.getContext(),R.drawable.ic_entity_map);
-                    //final BitmapDescriptor iconGroup = bitmapDescriptorFromVector(mFragment.getContext(),R.drawable.ic_entities_map);//BitmapDescriptorFactory.fromResource(R.drawable.ic_entities_map);
-                    for (EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup entity : entities) {
-
-                        //LatLng latLng = new LatLng(entity.location().lat(), entity.location().lon());
-                        EntityMarker item = null;
-                        if (entity.groupCount() == 1) {
-                            item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
-                        } else {
-                            item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entities_map);
+                    mFragment.getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            googleMap.clear();
+                            for (EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup entity : entities) {
+                                //LatLng latLng = new LatLng(entity.location().lat(), entity.location().lon());
+                                EntityMarker item = null;
+                                if (entity.groupCount() == 1) {
+                                    item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
+                                } else {
+                                    item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entities_map);
+                                }
+                                markerItems.add(item);
+//                        doneLoading[0] = true;
+//                        finishLoadingMap(googleMap, doneLoading);
+                            }
                         }
 
-                        markerItems.add(item);
-                    }
+                    });
+
                     mFragment.getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -409,8 +373,9 @@ Toast.LENGTH_SHORT).show());
                             for (EventsGeoLocationGroupQuery.EventsGeoLocationGroup event : events) {
                                 EventMarker item = new EventMarker(event.location().lat(), event.location().lon(), event.events(), null, R.drawable.ic_event_map);
                                 markerItems.add(item);
-
                             }
+//                            doneLoading[1] = true;
+//                            finishLoadingMap(googleMap, doneLoading);
                         }
                     });
                     mFragment.getActivity().runOnUiThread(new Runnable() {
@@ -445,6 +410,18 @@ Toast.LENGTH_SHORT).show());
                                 PlaceMarker item = new PlaceMarker(place.location().lat(), place.location().lon(), place.places(), null, R.drawable.ic_place_map);
                                 markerItems.add(item);
                             }
+//                            doneLoading[2] = true;
+//                            finishLoadingMap(googleMap, doneLoading);
+                        }
+
+                    });
+                    mFragment.getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            googleMap.clear();
+                            mClusterManager.clearItems();
+                            mClusterManager.addItems(markerItems);
+                            mClusterManager.cluster();
                         }
                     });
 
@@ -457,6 +434,26 @@ Toast.LENGTH_SHORT).show());
             });
         }
     }
+
+   /* private void finishLoadingMap(GoogleMap googleMap, Boolean[] doneLoading) {
+        for (int i = 0; i < filters.length; i++) {
+            Log.e("Filters", "position: " + i + " " + filters[i]);
+        }
+        for (int i = 0; i < doneLoading.length; i++) {
+            Log.e("Filters loading", "position: " + i + " " + doneLoading[i]);
+        }
+        if (filters[0] == doneLoading[0] && filters[1] == doneLoading[1] && filters[2] == doneLoading[2] && !loading) {
+            loading = true;
+            mFragment.getActivity().runOnUiThread(() -> {
+                googleMap.clear();
+                mClusterManager.clearItems();
+                mClusterManager.addItems(markerItems);
+                mClusterManager.
+                mClusterManager.cluster();
+                loading = false;
+            });
+        }
+    }*/
 
     public void setUpMapUpdateListener() {
         if (isGPSEnabled)
@@ -481,7 +478,7 @@ Toast.LENGTH_SHORT).show());
         Log.d("IS", "CAMERA IDLE");
         float zoom = mMap.getCameraPosition().zoom;
         LatLng current = mMap.getCameraPosition().target;
-        float radius = getRadius(mMap);
+        float radius =  mClusterManager.getRadius(mMap);
         if (!lastPossition.equals(current)) {
             Log.d("IS", "POSITION CHANGED " + lastPossition + " new " + current);
             updateMarkers(mMap, current, radius);
@@ -492,7 +489,8 @@ Toast.LENGTH_SHORT).show());
     public void updateFilters(Boolean[] filters) {
         this.filters = filters;
         LatLng current = mMap.getCameraPosition().target;
-        float radius = getRadius(mMap);
+        float radius =  mClusterManager.getRadius(mMap);
+
         updateMarkers(mMap, current, radius);
         lastPossition = current;
     }
@@ -509,23 +507,6 @@ Toast.LENGTH_SHORT).show());
 //            lastPossition = current;
 //        }
 //    }
-
-    public void updateLocalPositionFromData(double[] location) {
-        lastPossition = new LatLng(location[0], location[1]);
-        float radius = getRadius(mMap);
-        LatLng current = new LatLng(location[0], location[1]);
-        updateMarkers(mMap, current, radius);
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(location[0], location[1])));
-    }
-
-    public void updateLocalPositionFromData() {
-        if (location.getValue() != null) {
-            lastPossition = new LatLng(location.getValue()[0], location.getValue()[1]);
-            float radius = getRadius(mMap);
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPossition, 18));
-//            updateMarkers(mMap, lastPossition, radius);
-        }
-    }
 
     public GoogleMap getmMap() {
         return mMap;

@@ -6,20 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.graphql.EntityDetailQuery;
 import cz.deepvision.iti.is.graphql.EventDetailQuery;
@@ -31,6 +24,9 @@ import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.dialog.EventDialog;
 import cz.deepvision.iti.is.ui.dialog.PlaceDialog;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class LisViewAdapter extends RecyclerView.Adapter<LisViewAdapter.ViewHolder> {
     private List<ListViewItem> items;

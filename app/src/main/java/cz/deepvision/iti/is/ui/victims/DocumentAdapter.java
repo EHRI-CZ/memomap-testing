@@ -6,17 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.List;
-
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.victims.Document;
 import cz.deepvision.iti.is.ui.dialog.DocumentDialog;
 import cz.deepvision.iti.is.util.Requester;
+
+import java.util.List;
 
 public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.DocumentViewHolder> {
     private List<Document> items;

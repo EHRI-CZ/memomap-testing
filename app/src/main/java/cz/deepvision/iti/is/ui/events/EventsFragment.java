@@ -12,7 +12,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,14 +19,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
-import cz.deepvision.iti.is.ui.victims.VictimsAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventsFragment extends Fragment {
 

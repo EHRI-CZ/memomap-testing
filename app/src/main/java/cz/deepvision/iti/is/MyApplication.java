@@ -1,7 +1,6 @@
 package cz.deepvision.iti.is;
 
 import android.app.Application;
-
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 

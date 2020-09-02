@@ -1,26 +1,20 @@
 package cz.deepvision.iti.is.ui.victims;
 
 import android.util.Log;
-import android.widget.Toast;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.maps.model.LatLng;
-
+import cz.deepvision.iti.is.graphql.EntitiesGeoListLimitedQuery;
+import cz.deepvision.iti.is.models.victims.RecordListItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TooManyListenersException;
-
-import cz.deepvision.iti.is.graphql.EntitiesGeoListLimitedQuery;
-import cz.deepvision.iti.is.models.victims.RecordListItem;
 
 public class VictimsViewModel extends ViewModel {
 

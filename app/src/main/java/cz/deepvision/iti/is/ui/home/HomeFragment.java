@@ -1,22 +1,16 @@
 package cz.deepvision.iti.is.ui.home;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Application;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -25,13 +19,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-
-import com.google.android.gms.maps.GoogleMap;
 import com.warkiz.widget.IndicatorSeekBar;
-
 import cz.deepvision.iti.is.R;
+import cz.deepvision.iti.is.models.Location;
 
 public class HomeFragment extends Fragment {
     private final String[] mPermission = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET};
@@ -41,7 +31,11 @@ public class HomeFragment extends Fragment {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(mPermission, 1);
         }
-        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        Location location = null;
+        if(this.getArguments() != null){
+            location = new Location(this.getArguments().getDoubleArray("location"));
+        }
+            homeViewModel = ViewModelProviders.of(this, new HomeViewModelFactory((Application) getContext().getApplicationContext(), location)).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final TextView textView = root.findViewById(R.id.text_home);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -115,35 +109,4 @@ public class HomeFragment extends Fragment {
             }
         }
     }
-
-    private BroadcastReceiver showOnMapReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Intent.ACTION_SENDTO)) {
-                Log.d("Broadcast", "arriaved to fragment");
-                if (intent.getDoubleArrayExtra("location") != null) {
-                    double[] location = intent.getDoubleArrayExtra("location");
-                    homeViewModel.getmMap().setOnMapLoadedCallback(() -> {
-                        homeViewModel.getLocation().postValue(location);
-                        homeViewModel.updateLocalPositionFromData();
-                    });
-                    if (showOnMapReceiver != null) getActivity().unregisterReceiver(showOnMapReceiver);
-                }
-            }
-        }
-    };
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_SENDTO);
-        getActivity().registerReceiver(showOnMapReceiver, intentFilter);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
 }

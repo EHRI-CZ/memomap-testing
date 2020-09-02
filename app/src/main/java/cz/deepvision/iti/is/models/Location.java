@@ -14,6 +14,11 @@ public class Location extends RealmObject {
         this.lng = lng;
     }
 
+    public Location(double[] locations) {
+        this.lat = locations[0];
+        this.lng = locations[1];
+    }
+
     public Double getLat() {
         return lat;
     }

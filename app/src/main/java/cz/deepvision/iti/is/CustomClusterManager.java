@@ -6,21 +6,13 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
-
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.android.gms.maps.model.*;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-
 import cz.deepvision.iti.is.models.markers.CustomMarker;
 
 
@@ -50,7 +42,7 @@ public class CustomClusterManager<M> extends ClusterManager {
         this.mOnCameraIdleExtension = mOnCameraIdleExtension;
     }
 
-    public float getRadius(GoogleMap googleMap){
+    public float getRadius(GoogleMap googleMap) {
         VisibleRegion visibleRegion = googleMap.getProjection().getVisibleRegion();
 
         LatLng farRight = visibleRegion.farRight;
@@ -59,27 +51,15 @@ public class CustomClusterManager<M> extends ClusterManager {
         LatLng nearLeft = visibleRegion.nearLeft;
 
         float[] distanceWidth = new float[2];
-        Location.distanceBetween(
-                (farRight.latitude+nearRight.latitude)/2,
-                (farRight.longitude+nearRight.longitude)/2,
-                (farLeft.latitude+nearLeft.latitude)/2,
-                (farLeft.longitude+nearLeft.longitude)/2,
-                distanceWidth
-        );
+        Location.distanceBetween((farRight.latitude + nearRight.latitude) / 2, (farRight.longitude + nearRight.longitude) / 2, (farLeft.latitude + nearLeft.latitude) / 2, (farLeft.longitude + nearLeft.longitude) / 2, distanceWidth);
 
 
         float[] distanceHeight = new float[2];
-        Location.distanceBetween(
-                (farRight.latitude+nearRight.latitude)/2,
-                (farRight.longitude+nearRight.longitude)/2,
-                (farLeft.latitude+nearLeft.latitude)/2,
-                (farLeft.longitude+nearLeft.longitude)/2,
-                distanceHeight
-        );
+        Location.distanceBetween((farRight.latitude + nearRight.latitude) / 2, (farRight.longitude + nearRight.longitude) / 2, (farLeft.latitude + nearLeft.latitude) / 2, (farLeft.longitude + nearLeft.longitude) / 2, distanceHeight);
 
         float distance;
 
-        if (distanceWidth[0]>distanceHeight[0]){
+        if (distanceWidth[0] > distanceHeight[0]) {
             distance = distanceWidth[0];
         } else {
             distance = distanceHeight[0];

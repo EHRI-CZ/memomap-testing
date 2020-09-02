@@ -2,18 +2,13 @@ package cz.deepvision.iti.is.ui.dialog;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Place;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;

@@ -4,27 +4,15 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
+import cz.deepvision.iti.is.ui.dialog.DefaultDialog;
+import okhttp3.*;
 
+import javax.net.ssl.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import cz.deepvision.iti.is.ui.dialog.DefaultDialog;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class Requester {
     private Activity activity;
@@ -89,7 +77,6 @@ public class Requester {
                             photo.setImageBitmap(bitmap);
                         }
                     });
-                    throw new IOException("Unexpected code " + response);
                 }
             }
         });
