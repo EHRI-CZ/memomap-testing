@@ -57,7 +57,8 @@ public class VictimsViewModel extends ViewModel {
                         List<RecordListItem> items = new ArrayList<>();
                         for (EntitiesGeoListLimitedQuery.EntitiesGeoListLimited dbItem:response.data().entitiesGeoListLimited()) {
                             RecordListItem item = new RecordListItem();
-                            item.setLabel(number + ":" +dbItem.entity_label());
+                            item.setLabel(dbItem.entity_label());
+//                            item.setLabel(number + ":" +dbItem.entity_label());
                             item.setKey(dbItem.id());
                             item.setUrl(dbItem.preview());
                             items.add(item);

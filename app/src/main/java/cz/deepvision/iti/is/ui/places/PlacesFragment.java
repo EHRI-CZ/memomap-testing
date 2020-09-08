@@ -12,6 +12,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
@@ -65,7 +67,7 @@ public class PlacesFragment extends Fragment {
                             adapter.setLoaded();
                         }
                     }, 5000);
-                }else {
+                } else {
                     placesViewModel.loadData();
                     adapter.notifyDataSetChanged();
                     button.setVisibility(View.GONE);
@@ -80,6 +82,8 @@ public class PlacesFragment extends Fragment {
                 itemList.addAll(victimListItems);
                 adapter.notifyDataSetChanged();
                 adapter.setLoaded();
+                if (itemList.size() > 23)
+                    Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
@@ -114,15 +118,15 @@ public class PlacesFragment extends Fragment {
 
             @Override
             public void hideButton() {
-                startAnimation(container,View.GONE);
+                startAnimation(container, View.GONE);
             }
 
             @Override
             public void showButton() {
-                startAnimation(container,View.VISIBLE);
+                startAnimation(container, View.VISIBLE);
             }
 
-            private void startAnimation(ViewGroup root,int visibility) {
+            private void startAnimation(ViewGroup root, int visibility) {
                 AutoTransition transition = new AutoTransition();
                 transition.setDuration(200);
                 transition.setInterpolator(new AccelerateDecelerateInterpolator());

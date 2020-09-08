@@ -109,7 +109,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (holder instanceof ItemViewHolder) {
             RecordListItem item = items.get(position);
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-            itemViewHolder.setUpPersonData(item.getKey(), item.getUrl(), item.getLabel());
+            itemViewHolder.setUpEventData(item.getKey(), item.getUrl(), item.getLabel());
         } else if (holder instanceof LoadingViewHolder) {
             LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
             loadingViewHolder.progressBar.setIndeterminate(true);
@@ -158,7 +158,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             });
         }
 
-        public void setUpPersonData(String key, String url, String label) {
+        public void setUpEventData(String key, String url, String label) {
             this.key = key;
             this.url = url;
             this.title.setText(label);

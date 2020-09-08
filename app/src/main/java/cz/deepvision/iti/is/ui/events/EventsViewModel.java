@@ -42,15 +42,15 @@ public class EventsViewModel extends ViewModel {
 
     public void loadData() {
         ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-        LatLng location = new LatLng(50.088780, 14.419094);
-        final int[] radius = {150};
-        if (mOffset > 0) radius[0] = 150 * (mOffset / 24);
+        LatLng location = new LatLng(50.0853034, 14.4276448);
+        int radius = 150;
+        if (mOffset > 0) radius = 150 * (mOffset / 24);
         if (mOffset == 0) {
             number = 1;
         }
         // TODO : Zobrazení vícero osob, data takhle přijdou, takže chyba buď GRAPHQL, nebo ITI
         // TODO : Limit nefunguje s větším radiusem přijde záznamů více
-        apolloClient.query(new EventsGeoListLimitedQuery(location.longitude, location.latitude, (int) radius[0], mOffset, 24)).enqueue(new ApolloCall.Callback<EventsGeoListLimitedQuery.Data>() {
+        apolloClient.query(new EventsGeoListLimitedQuery(location.longitude, location.latitude, (int) radius, mOffset, 24)).enqueue(new ApolloCall.Callback<EventsGeoListLimitedQuery.Data>() {
             @Override
             public void onResponse(@NotNull final Response<EventsGeoListLimitedQuery.Data> response) {
                 List<RecordListItem> items = new ArrayList<>();

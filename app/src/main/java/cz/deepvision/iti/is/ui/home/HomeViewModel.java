@@ -7,11 +7,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -21,6 +23,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
@@ -36,6 +39,7 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+
 import cz.deepvision.iti.is.CustomClusterManager;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.graphql.*;
@@ -50,10 +54,12 @@ import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.dialog.EventDialog;
 import cz.deepvision.iti.is.ui.dialog.PlaceDialog;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class HomeViewModel extends AndroidViewModel implements CustomClusterManager.onCameraIdleExtension, LocationListener {
 
@@ -144,17 +150,13 @@ Toast.LENGTH_SHORT).show());
     final ClusterManager.OnClusterItemClickListener onClusterClickListener = new ClusterManager.OnClusterItemClickListener() {
         @Override
         public boolean onClusterItemClick(ClusterItem item) {
-            CustomMarker selected = null;
-            for (CustomMarker markerItem : markerItems) {
-                if (markerItem.getTitle().equals(item.getTitle())) selected = markerItem;
-            }
-            if (selected != null) {
-                if (selected instanceof EventMarker) {
-                    previewEvent((EventMarker) selected);
-                } else if (selected instanceof EntityMarker) {
-                    previewEntity((EntityMarker) selected);
+           if (item != null) {
+                if (item instanceof EventMarker) {
+                    previewEvent((EventMarker) item);
+                } else if (item instanceof EntityMarker) {
+                    previewEntity((EntityMarker) item);
                 } else {
-                    previewPlace((PlaceMarker) selected);
+                    previewPlace((PlaceMarker) item);
                 }
             }
             return false;
@@ -321,36 +323,19 @@ Toast.LENGTH_SHORT).show());
                 @Override
                 public void onResponse(@NotNull Response<EntitiesGeoLocationGroupQuery.Data> response) {
                     final List<EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup> entities = response.data().entitiesGeoLocationGroup();
-                    mFragment.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            googleMap.clear();
-                            for (EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup entity : entities) {
-                                //LatLng latLng = new LatLng(entity.location().lat(), entity.location().lon());
-                                EntityMarker item = null;
-                                if (entity.groupCount() == 1) {
-                                    item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
-                                } else {
-                                    item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entities_map);
-                                }
-                                markerItems.add(item);
+                    for (EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup entity : entities) {
+                        //LatLng latLng = new LatLng(entity.location().lat(), entity.location().lon());
+                        EntityMarker item = null;
+                        if (entity.groupCount() == 1) {
+                            item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
+                        } else {
+                            item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entities_map);
+                        }
+                        markerItems.add(item);
 //                        doneLoading[0] = true;
 //                        finishLoadingMap(googleMap, doneLoading);
-                            }
-                        }
-
-                    });
-
-                    mFragment.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            googleMap.clear();
-                            mClusterManager.clearItems();
-                            mClusterManager.addItems(markerItems);
-                            mClusterManager.cluster();
-                        }
-                    });
-
+                    }
+                    updateMap(googleMap);
                 }
 
                 @Override
@@ -366,27 +351,14 @@ Toast.LENGTH_SHORT).show());
                 @Override
                 public void onResponse(@NotNull Response<EventsGeoLocationGroupQuery.Data> response) {
                     final List<EventsGeoLocationGroupQuery.EventsGeoLocationGroup> events = response.data().eventsGeoLocationGroup();
-                    mFragment.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            googleMap.clear();
-                            for (EventsGeoLocationGroupQuery.EventsGeoLocationGroup event : events) {
-                                EventMarker item = new EventMarker(event.location().lat(), event.location().lon(), event.events(), null, R.drawable.ic_event_map);
-                                markerItems.add(item);
-                            }
+                    for (EventsGeoLocationGroupQuery.EventsGeoLocationGroup event : events) {
+                        EventMarker item = new EventMarker(event.location().lat(), event.location().lon(), event.events(), null, R.drawable.ic_event_map);
+                        markerItems.add(item);
+                    }
 //                            doneLoading[1] = true;
 //                            finishLoadingMap(googleMap, doneLoading);
-                        }
-                    });
-                    mFragment.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            googleMap.clear();
-                            mClusterManager.clearItems();
-                            mClusterManager.addItems(markerItems);
-                            mClusterManager.cluster();
-                        }
-                    });
+                    updateMap(googleMap);
+
                 }
 
                 @Override
@@ -402,29 +374,13 @@ Toast.LENGTH_SHORT).show());
                 @Override
                 public void onResponse(@NotNull final Response<PlacesGeoLocationGroupQuery.Data> response) {
                     final List<PlacesGeoLocationGroupQuery.PlacesGeoLocationGroup> places = response.data().placesGeoLocationGroup();
-                    mFragment.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            googleMap.clear();
-                            for (PlacesGeoLocationGroupQuery.PlacesGeoLocationGroup place : places) {
-                                PlaceMarker item = new PlaceMarker(place.location().lat(), place.location().lon(), place.places(), null, R.drawable.ic_place_map);
-                                markerItems.add(item);
-                            }
+                    for (PlacesGeoLocationGroupQuery.PlacesGeoLocationGroup place : places) {
+                        PlaceMarker item = new PlaceMarker(place.location().lat(), place.location().lon(), place.places(), null, R.drawable.ic_place_map);
+                        markerItems.add(item);
+                    }
 //                            doneLoading[2] = true;
 //                            finishLoadingMap(googleMap, doneLoading);
-                        }
-
-                    });
-                    mFragment.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            googleMap.clear();
-                            mClusterManager.clearItems();
-                            mClusterManager.addItems(markerItems);
-                            mClusterManager.cluster();
-                        }
-                    });
-
+                    updateMap(googleMap);
                 }
 
                 @Override
@@ -432,6 +388,25 @@ Toast.LENGTH_SHORT).show());
                     Log.e("IS", e.getMessage());
                 }
             });
+        }
+    }
+
+    private void updateMap(GoogleMap googleMap) {
+        if (mFragment != null && mFragment.getActivity() != null) {
+
+            mFragment.getActivity().runOnUiThread(() -> {
+                googleMap.clear();
+//                removeMarkerse();
+                mClusterManager.clearItems();
+                mClusterManager.addItems(markerItems);
+                mClusterManager.cluster();
+            });
+        }
+    }
+
+    private synchronized void removeMarkerse() {
+        for (Marker marker : mClusterManager.getClusterMarkerCollection().getMarkers()) {
+            marker.remove();
         }
     }
 
@@ -478,7 +453,7 @@ Toast.LENGTH_SHORT).show());
         Log.d("IS", "CAMERA IDLE");
         float zoom = mMap.getCameraPosition().zoom;
         LatLng current = mMap.getCameraPosition().target;
-        float radius =  mClusterManager.getRadius(mMap);
+        float radius = mClusterManager.getRadius(mMap);
         if (!lastPossition.equals(current)) {
             Log.d("IS", "POSITION CHANGED " + lastPossition + " new " + current);
             updateMarkers(mMap, current, radius);
@@ -489,8 +464,7 @@ Toast.LENGTH_SHORT).show());
     public void updateFilters(Boolean[] filters) {
         this.filters = filters;
         LatLng current = mMap.getCameraPosition().target;
-        float radius =  mClusterManager.getRadius(mMap);
-
+        float radius = mClusterManager.getRadius(mMap);
         updateMarkers(mMap, current, radius);
         lastPossition = current;
     }

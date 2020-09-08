@@ -13,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.*;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
 import cz.deepvision.iti.is.models.markers.CustomMarker;
 
 
@@ -20,11 +21,12 @@ public class CustomClusterManager<M> extends ClusterManager {
     private GoogleMap map;
     private onCameraIdleExtension mOnCameraIdleExtension;
     private Context ctx;
+
     public CustomClusterManager(Context context, GoogleMap map) {
         super(context, map);
         ctx = context;
         this.map = map;
-        this.setRenderer(new CustomRenderer(context,map,this));
+        this.setRenderer(new CustomRenderer(context, map, this));
     }
 
     @Override
@@ -68,11 +70,9 @@ public class CustomClusterManager<M> extends ClusterManager {
     }
 
 
-
-
-
     private class CustomRenderer extends DefaultClusterRenderer<CustomMarker> {
         Context cnt;
+
         public CustomRenderer(Context context, GoogleMap map, ClusterManager clusterManager) {
             super(context, map, clusterManager);
             cnt = context;
@@ -81,28 +81,29 @@ public class CustomClusterManager<M> extends ClusterManager {
         @Override
         protected void onBeforeClusterItemRendered(@NonNull CustomMarker item, @NonNull MarkerOptions markerOptions) {
             super.onBeforeClusterItemRendered(item, markerOptions);
-            markerOptions.icon(bitmapDescriptorFromVector(cnt,item.icon));
+            markerOptions.icon(bitmapDescriptorFromVector(cnt, item.icon));
         }
 
         @Override
         protected void onClusterItemUpdated(@NonNull CustomMarker item, @NonNull Marker marker) {
             super.onClusterItemUpdated(item, marker);
             try {
-                marker.setIcon(bitmapDescriptorFromVector(cnt,item.icon));
-            }catch (Exception e){
-                Log.e("IS",e.getMessage());
+                if (marker.getTag() != null)
+                    marker.setIcon(bitmapDescriptorFromVector(cnt, item.icon));
+            } catch (Exception e) {
+                Log.e("IS", e.getMessage());
             }
-
         }
+
 
         private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
             int resize = 2;
-            if(vectorDrawableResourceId == R.drawable.ic_entities_map){
+            if (vectorDrawableResourceId == R.drawable.ic_entities_map) {
                 resize = 3;
             }
             Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
-            vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth()/resize, vectorDrawable.getIntrinsicHeight()/resize);
-            Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth()/resize, vectorDrawable.getIntrinsicHeight()/resize, Bitmap.Config.ARGB_8888);
+            vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth() / resize, vectorDrawable.getIntrinsicHeight() / resize);
+            Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth() / resize, vectorDrawable.getIntrinsicHeight() / resize, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             vectorDrawable.draw(canvas);
             return BitmapDescriptorFactory.fromBitmap(bitmap);
