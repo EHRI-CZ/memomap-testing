@@ -163,8 +163,9 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.url = url;
             this.title.setText(label);
             if (url != null) {
+                String substring = url.substring(1, url.length());
                 Requester requester = new Requester(fragment.getActivity());
-                requester.makeRequestForAdapter(url, icon);
+                requester.makeRequestForAdapter(substring, icon);
             } else icon.setImageDrawable(activity.getDrawable(R.drawable.no_portrait_icon));
 
         }
