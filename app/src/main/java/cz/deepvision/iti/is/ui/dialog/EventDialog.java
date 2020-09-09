@@ -77,6 +77,7 @@ public class EventDialog extends DefaultDialog implements DefaultDialog.Updater<
                 getSecondIcon().setEnabled(false);
                 getSecondIcon().setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_navigate_grayed));
             }
+            getInfoContainer().setVisibility(View.GONE);
             getName().setText(data.getLabel());
             getPhoto().setVisibility(View.GONE);
         }

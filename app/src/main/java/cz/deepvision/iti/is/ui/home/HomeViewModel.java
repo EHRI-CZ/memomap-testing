@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,7 +34,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
@@ -59,7 +57,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class HomeViewModel extends AndroidViewModel implements CustomClusterManager.onCameraIdleExtension, LocationListener {
 
@@ -73,7 +70,6 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
     private LatLng lastPossition = new LatLng(50.088780, 14.419094);
     private boolean isGPSEnabled = false;
     private LocationManager mLocationManager = null;
-    private List<CustomMarker> markerItems;
     private Boolean[] filters = new Boolean[]{true, true, true};
     private boolean loading = false;
 
@@ -150,7 +146,7 @@ Toast.LENGTH_SHORT).show());
     final ClusterManager.OnClusterItemClickListener onClusterClickListener = new ClusterManager.OnClusterItemClickListener() {
         @Override
         public boolean onClusterItemClick(ClusterItem item) {
-           if (item != null) {
+            if (item != null) {
                 if (item instanceof EventMarker) {
                     previewEvent((EventMarker) item);
                 } else if (item instanceof EntityMarker) {
@@ -314,7 +310,7 @@ Toast.LENGTH_SHORT).show());
 
     public void updateMarkers(final GoogleMap googleMap, LatLng location, float radius) {
         ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-        markerItems = new ArrayList<>();
+        List<CustomMarker> markerItems = new ArrayList<>();
         Boolean[] doneLoading = new Boolean[]{false, false, false};
 
         if (filters[0]) {
@@ -326,16 +322,12 @@ Toast.LENGTH_SHORT).show());
                     for (EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup entity : entities) {
                         //LatLng latLng = new LatLng(entity.location().lat(), entity.location().lon());
                         EntityMarker item = null;
-                        if (entity.groupCount() == 1) {
-                            item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
-                        } else {
-                            item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entities_map);
-                        }
+                        item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
                         markerItems.add(item);
 //                        doneLoading[0] = true;
 //                        finishLoadingMap(googleMap, doneLoading);
                     }
-                    updateMap(googleMap);
+                    updateMap(googleMap, markerItems);
                 }
 
                 @Override
@@ -357,7 +349,7 @@ Toast.LENGTH_SHORT).show());
                     }
 //                            doneLoading[1] = true;
 //                            finishLoadingMap(googleMap, doneLoading);
-                    updateMap(googleMap);
+                    updateMap(googleMap, markerItems);
 
                 }
 
@@ -380,7 +372,7 @@ Toast.LENGTH_SHORT).show());
                     }
 //                            doneLoading[2] = true;
 //                            finishLoadingMap(googleMap, doneLoading);
-                    updateMap(googleMap);
+                    updateMap(googleMap, markerItems);
                 }
 
                 @Override
@@ -391,7 +383,7 @@ Toast.LENGTH_SHORT).show());
         }
     }
 
-    private void updateMap(GoogleMap googleMap) {
+    private void updateMap(GoogleMap googleMap, List<CustomMarker> markerItems) {
         if (mFragment != null && mFragment.getActivity() != null) {
 
             mFragment.getActivity().runOnUiThread(() -> {

@@ -1,23 +1,30 @@
 package cz.deepvision.iti.is.ui.dialog;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+
+import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.victims.Event;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
+import cz.deepvision.iti.is.ui.victims.VictimsViewModel;
 import cz.deepvision.iti.is.util.Requester;
 
 import java.util.List;
@@ -39,6 +46,30 @@ public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater
         super(context, small);
         fragment = inputFragment;
         this.data = data;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onStart() {
+        super.onStart();
+//        dialog.getWindow().getDecorView().setOnTouchListener((view, event) -> {
+//            switch(event.getAction())
+//            {
+//                case MotionEvent.ACTION_DOWN:
+//                    x1 = event.getX();
+//                    break;
+//                case MotionEvent.ACTION_UP:
+//                    x2 = event.getX();
+//                    float deltaX = x2 - x1;
+//                    if (Math.abs(deltaX) > MIN_DISTANCE)
+//                    {
+//                        VictimsViewModel.
+//                        Toast.makeText(fragment.getActivity(), "left2right swipe", Toast.LENGTH_SHORT).show ();
+//                    }
+//                    break;
+//            }
+//            return false;
+//        });
     }
 
     @Override
@@ -116,7 +147,8 @@ public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater
             if (!imageUrl.equals("")) {
                 Requester requester = new Requester(getActivity(), this);
                 requester.makeRequest(imageUrl);
-            }
+            } else getPhoto().setImageDrawable(ctx.getDrawable(R.drawable.no_portrait_icon));
+
 
             getName().setText(data.getName());
             addInfo(getInfoContainer(), getEndingChar("Narozen", data) + " " + data.getBorn());
@@ -145,10 +177,8 @@ public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater
         }
     }
 
-
     @Override
     public void updateData(Person data) {
         this.data = data;
     }
-
 }

@@ -136,7 +136,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             card = view.findViewById(R.id.row_root_element);
             icon = view.findViewById(R.id.imageView);
             card.setOnClickListener(view1 -> {
-                EventDialog eventDialog = new EventDialog(fragment, true);
+                EventDialog eventDialog = new EventDialog(fragment, false);
                 ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
                 apolloClient.query(new EventDetailQuery(key)).enqueue(new ApolloCall.Callback<EventDetailQuery.Data>() {
                     @Override

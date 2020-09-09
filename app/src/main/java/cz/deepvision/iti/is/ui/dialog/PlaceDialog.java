@@ -90,7 +90,8 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
             if (!imageUrl.equals("")) {
                 Requester requester = new Requester(getActivity(), this);
                 requester.makeRequest(imageUrl);
-            }
+            } else getPhoto().setImageDrawable(getActivity().getDrawable(R.drawable.ic_baseline_home_96));
+
 
         }
     }

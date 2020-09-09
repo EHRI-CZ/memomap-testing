@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.*;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +43,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private Context ctx;
     private Handler mHandler = new Handler();
+    private ProgressBar progressBar;
     private BottomSheetDialog builder;
 
     @Override
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         ctx = this;
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
+        progressBar = findViewById(R.id.search_progress_bar);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(R.id.navigation_home, R.id.navigation_victims, R.id.navigation_places, R.id.navigation_events, R.id.navigation_about).build();
@@ -82,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public boolean onQueryTextChange(String text) {
-
+                    progressBar.setVisibility(View.VISIBLE);
                     mHandler.removeCallbacksAndMessages(null);
                     mHandler.postDelayed(() -> {
+                        progressBar.setVisibility(View.INVISIBLE);
                         showList(text);
-                        Toast.makeText(ctx, text, Toast.LENGTH_SHORT).show();
                     }, 1000);
                     return true;
                 }
@@ -135,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                         Button button = root.findViewById(R.id.btn_close_list);
                         button.setOnClickListener(view -> builder.dismiss());
                     });
-                }
+                } else Toast.makeText(ctx, "Nebyli nalazeny žádné výsledky", Toast.LENGTH_SHORT).show();
             }
 
             @Override

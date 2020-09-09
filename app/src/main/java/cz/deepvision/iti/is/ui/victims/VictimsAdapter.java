@@ -8,27 +8,32 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.graphql.EntityDetailQuery;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
+import cz.deepvision.iti.is.ui.dialog.DefaultDialog;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
 import cz.deepvision.iti.is.util.Requester;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-    public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
     private OnLoadMoreListener onLoadMoreListener;
@@ -55,7 +60,6 @@ import java.util.List;
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
                 totalItemCount = gridLayoutManager.getItemCount();
                 lastVisibleItem = gridLayoutManager.findLastVisibleItemPosition();
               /*  if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
@@ -64,7 +68,7 @@ import java.util.List;
                     }
                     isLoading = true;
                 }*/
-                if(lastVisibleItem > totalItemCount-4){
+                if (lastVisibleItem > totalItemCount - 4) {
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.showButton();
                     }
@@ -154,7 +158,6 @@ import java.util.List;
                         Log.e("IS", e.getMessage());
                     }
                 });
-                //TODO : get query to show more detailed info
             });
         }
 

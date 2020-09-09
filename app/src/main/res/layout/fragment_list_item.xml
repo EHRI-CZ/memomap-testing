@@ -35,10 +35,14 @@
             <TextView
                 android:id="@+id/textview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="2dp"
                 android:layout_toEndOf="@+id/imageView"
                 android:gravity="center"
-                android:textSize="@dimen/regularText" />
+                app:autoSizeMaxTextSize="@dimen/regularText"
+                app:autoSizeTextType="uniform" />
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>

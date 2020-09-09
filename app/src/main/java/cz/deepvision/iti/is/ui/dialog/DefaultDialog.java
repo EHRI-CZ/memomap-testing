@@ -8,11 +8,14 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +23,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.flexbox.*;
+
+import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Location;
 import cz.deepvision.iti.is.util.LayoutGenerator;
@@ -39,7 +44,8 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
     protected LinearLayout iconsContainer;
     protected RecyclerView documentContainer;
     protected boolean isImageFitToScreen = false;
-
+    protected float x1,x2;
+    protected final int MIN_DISTANCE = 150;
     Fragment fragment;
 
     public DefaultDialog() {
@@ -144,7 +150,6 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
 
     protected interface Updater<T> {
         void updateData(T data);
-
     }
 
     protected void hideUI(int visibility) {
@@ -164,24 +169,6 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         getCtx().sendBroadcast(intent);
     }
-
-    /*private void dismissAllDialogs(FragmentManager manager) {
-        List<Fragment> fragments = manager.getFragments();
-
-        if (fragments == null)
-            return;
-
-        for (Fragment fragment : fragments) {
-            if (fragment instanceof DefaultDialog) {
-                DefaultDialog dialogFragment = (DefaultDialog) fragment;
-                dialogFragment.dismissAllowingStateLoss();
-            }
-
-            FragmentManager childFragmentManager = fragment.getChildFragmentManager();
-            if (childFragmentManager != null)
-                dismissAllDialogs(childFragmentManager);
-        }
-    }*/
 
     protected void updateDataOnMap(Location location) {
         fragment.getActivity().runOnUiThread(() -> {

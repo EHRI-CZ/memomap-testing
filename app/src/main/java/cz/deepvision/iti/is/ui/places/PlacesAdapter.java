@@ -168,7 +168,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             if (url != null) {
                 Requester requester = new Requester(fragment.getActivity());
                 requester.makeRequestForAdapter(url, icon);
-            } else icon.setImageDrawable(activity.getDrawable(R.drawable.no_portrait_icon));
+            } else icon.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_home_96));
 
         }
     }

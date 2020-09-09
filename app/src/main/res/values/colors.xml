@@ -9,5 +9,6 @@
     <color name="white">#ffffff</color>
     <color name="portrait_none">#d9d9d9</color>
     <color name="gray">#4C4C4C</color>
+    <color name="transparent_background">#5E000000</color>
 
 </resources>
