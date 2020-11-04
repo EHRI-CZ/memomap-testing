@@ -1,20 +1,24 @@
 package cz.deepvision.iti.is.ui.events;
 
 import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
 import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.maps.model.LatLng;
-import cz.deepvision.iti.is.graphql.EventsGeoListLimitedQuery;
-import cz.deepvision.iti.is.models.victims.RecordListItem;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.deepvision.iti.is.graphql.EventsGeoListLimitedQuery;
+import cz.deepvision.iti.is.models.victims.RecordListItem;
+import cz.deepvision.iti.is.util.NetworkConnection;
 
 public class EventsViewModel extends ViewModel {
 
@@ -41,7 +45,6 @@ public class EventsViewModel extends ViewModel {
     }
 
     public void loadData() {
-        ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
         LatLng location = new LatLng(50.0853034, 14.4276448);
         int radius = 150;
         if (mOffset > 0) radius = 150 * (mOffset / 24);
@@ -50,7 +53,8 @@ public class EventsViewModel extends ViewModel {
         }
         // TODO : Zobrazení vícero osob, data takhle přijdou, takže chyba buď GRAPHQL, nebo ITI
         // TODO : Limit nefunguje s větším radiusem přijde záznamů více
-        apolloClient.query(new EventsGeoListLimitedQuery(location.longitude, location.latitude, (int) radius, mOffset, 24)).enqueue(new ApolloCall.Callback<EventsGeoListLimitedQuery.Data>() {
+        NetworkConnection.getInstance().getApolloClient().query(new EventsGeoListLimitedQuery(location.longitude, location.latitude, (int) radius, mOffset, 24))
+                .enqueue(new ApolloCall.Callback<EventsGeoListLimitedQuery.Data>() {
             @Override
             public void onResponse(@NotNull final Response<EventsGeoListLimitedQuery.Data> response) {
                 List<RecordListItem> items = new ArrayList<>();

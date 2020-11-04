@@ -36,8 +36,8 @@
         style="?android:attr/progressBarStyleSmall"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/transparent_background"
         android:indeterminate="true"
+
         android:indeterminateTint="@color/iti_orange"
         android:padding="150dp"
         android:visibility="invisible"

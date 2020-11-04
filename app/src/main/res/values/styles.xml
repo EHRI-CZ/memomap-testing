@@ -5,22 +5,46 @@
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryDark">@color/black</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorButtonNormal">@color/iti_orange</item>
         <item name="android:textColor">@color/black</item>
-         <item name="fontFamily">@font/droid_sans_mono</item>
+        <item name="fontFamily">@font/droid_sans_mono</item>
 
+    </style>
+
+    <style name="FragmentsTitle">
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:textSize">25sp</item>
+        <item name="fontFamily">@font/droid_sans_mono</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="ThemeOverlay.MyTheme.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:fitsSystemWindows">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:windowAnimationStyle">@style/Animation.MyTheme.BottomSheet.Modal</item>
+        <item name="android:windowAnimationStyle">@style/Zoom</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="bottomSheetStyle">@style/Widget.MyTheme.BottomSheet.Modal</item>
-        <item name="android:navigationBarColor">?colorSurface</item>
     </style>
+
+    <style name="ThemeOverlay.MyTheme.BottomSheetDialog.SlideLeft" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowAnimationStyle">@style/SlideLeftSide</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/Widget.MyTheme.BottomSheet.Modal</item>
+    </style>
+    <style name="ThemeOverlay.MyTheme.BottomSheetDialogSlideRight" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowAnimationStyle">@style/SlideRightSide</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/Widget.MyTheme.BottomSheet.Modal</item>
+    </style>
+    <style name="ThemeOverlay.MyTheme.BottomSheetDialogSlideUpDown" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowAnimationStyle">@style/SlideUpDown</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/Widget.MyTheme.BottomSheet.Modal</item>
+    </style>
+
     <style name="Widget.MyTheme.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">?shapeAppearanceLargeComponent</item>
     </style>

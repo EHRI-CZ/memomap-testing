@@ -1,32 +1,38 @@
 package cz.deepvision.iti.is.ui.dialog;
 
-import android.app.AlertDialog;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.*;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.flexbox.*;
 
-import cz.deepvision.iti.is.OnLoadMoreListener;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import cz.deepvision.iti.is.OnShowAnotherElement;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Location;
+import cz.deepvision.iti.is.ui.home.HomeFragment;
 import cz.deepvision.iti.is.util.LayoutGenerator;
 import cz.deepvision.iti.is.util.Requester;
 
@@ -34,7 +40,7 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
     protected Context ctx;
     protected Dialog dialog;
     protected boolean smallDialog;
-    protected FrameLayout root;
+    protected ConstraintLayout root;
     protected TextView name;
     protected ImageView photo;
     protected ImageView firstIcon;
@@ -44,23 +50,52 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
     protected LinearLayout iconsContainer;
     protected RecyclerView documentContainer;
     protected boolean isImageFitToScreen = false;
-    protected float x1,x2;
-    protected final int MIN_DISTANCE = 150;
+    protected float oldTouchValue, currentX;
+    private OnShowAnotherElement onShowAnotherElement;
+    private final int MIN_DISTANCE = 150;
+    private int style = 0;
     Fragment fragment;
 
-    public DefaultDialog() {
+
+    /**
+     * @param inputFragment Fragment for checking current position
+     * @param smallDialog Fullscreen ?
+     * @param style         0 - default, -1 left slide, 1 right slide, 2 slideUp
+     */
+
+    public DefaultDialog(@NonNull Fragment inputFragment, boolean smallDialog, int style) {
+        this.ctx = inputFragment.requireContext();
+        fragment = inputFragment;
+        this.smallDialog = smallDialog;
+        this.style = style;
+        LayoutGenerator.init(ctx);
     }
 
-    public DefaultDialog(@NonNull Context context, boolean smallDialog) {
-        this.ctx = context;
+    public DefaultDialog(@NonNull Fragment inputFragment, boolean smallDialog) {
+        this.ctx = inputFragment.requireContext();
+        fragment = inputFragment;
         this.smallDialog = smallDialog;
+        style = 0;
         LayoutGenerator.init(ctx);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog);
+        setAllowEnterTransitionOverlap(true);
+        setAllowReturnTransitionOverlap(true);
+        if (style == 0)
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog);
+        else if (style == -1)
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog_SlideLeft);
+        else if (style == 1)
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideRight);
+        else
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideUpDown);
+    }
+
+    public void setOnShowAnotherElement(OnShowAnotherElement onShowAnotherElement) {
+        this.onShowAnotherElement = onShowAnotherElement;
     }
 
     @Override
@@ -68,7 +103,6 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         super.onStart();
         dialog = getDialog();
         if (dialog != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
             int height;
             if (smallDialog) height = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -93,9 +127,10 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        root = (FrameLayout) view;
+        root = (ConstraintLayout) view;
         name = view.findViewById(R.id.txt_info);
         photo = view.findViewById(R.id.img_general);
         infoContainer = view.findViewById(R.id.info_container);
@@ -106,42 +141,72 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         secondIcon = view.findViewById(R.id.img_navigate);
         thirdIcon = view.findViewById(R.id.img_close_info);
         thirdIcon.setOnClickListener(icon -> {
-            dismiss();
-            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-
+            icon.animate().setDuration(200).rotationBy(360).alpha(0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    dismiss();
+                }
+            });
         });
+
         setCancelable(false);
         firstIcon.setOnClickListener(view1 -> updateDataOnMap(null));
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+        View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.performClick();
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        oldTouchValue = event.getX();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        currentX = event.getX();
+                        if (oldTouchValue < currentX) {
+                            if (currentX - oldTouchValue > MIN_DISTANCE)
+                                if (onShowAnotherElement != null) {
+                                    onShowAnotherElement.showPrevious();
+                                }
+                        } else {
+                            if (oldTouchValue - currentX > MIN_DISTANCE)
+                                if (onShowAnotherElement != null) {
+                                    onShowAnotherElement.showNext();
+                                }
+                        }
+                        break;
+                }
+                return false;
+            }
+        };
+        if (getParentFragment() != null) {
+            if (!smallDialog && !(getParentFragment() instanceof HomeFragment)) {
+                root.setOnTouchListener(onTouchListener);
+                infoContainer.setOnTouchListener(onTouchListener);
+                documentContainer.setOnTouchListener(onTouchListener);
+            }
+        }
 
         if (smallDialog) {
-            getName().setTextSize(25);
+            name.setTextSize(25);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                getName().setLineHeight(60);
+                name.setLineHeight(60);
             }
         } else {
-            getName().setTextSize(30);
+            name.setTextSize(30);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                getName().setLineHeight(100);
+                name.setLineHeight(100);
             }
         }
         if (!smallDialog) {
             if (!fragment.getClass().getName().equals("cz.deepvision.iti.is.ui.home.HomeFragment")) {
-                getFirstIcon().setVisibility(View.VISIBLE);
-                getFirstIcon().setImageDrawable(getCtx().getDrawable(R.drawable.ic_iti_menu_map));
+                firstIcon.setVisibility(View.VISIBLE);
+                firstIcon.setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_menu_map));
             } else {
-                getFirstIcon().setVisibility(View.GONE);
+                firstIcon.setVisibility(View.GONE);
             }
+            documentContainer.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         }
-
-        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
-        layoutManager.setFlexDirection(FlexDirection.ROW);
-        layoutManager.setFlexWrap(FlexWrap.WRAP);
-        layoutManager.setAlignItems(AlignItems.FLEX_START);
-        layoutManager.setJustifyContent(JustifyContent.CENTER);
-        documentContainer.setVisibility(isSmallDialog() ? View.GONE : View.VISIBLE);
-        documentContainer.setLayoutManager(layoutManager);
-
     }
 
     public boolean isSmallDialog() {
@@ -152,10 +217,10 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         void updateData(T data);
     }
 
+
     protected void hideUI(int visibility) {
         name.setVisibility(visibility);
         infoContainer.setVisibility(visibility);
-        iconsContainer.setVisibility(visibility);
         documentContainer.setVisibility(visibility);
 
     }
@@ -165,14 +230,13 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra("location", new double[]{location.getLat(), location.getLng()});
         dialog.dismiss();
-//        dismissAllDialogs(fragment.getActivity().getSupportFragmentManager());
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-        getCtx().sendBroadcast(intent);
+        ctx.sendBroadcast(intent);
     }
 
     protected void updateDataOnMap(Location location) {
         fragment.getActivity().runOnUiThread(() -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(fragment.requireContext());
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(fragment.requireContext());
             builder.setTitle("Přesměrování");
             builder.setMessage("Chcete otevřít Google maps ?");
             builder.setPositiveButton("Ano", (dialogInterface, i) -> {
@@ -194,55 +258,7 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
     @Override
     public void update(Bitmap bmp) {
         if (bmp != null) {
-            getPhoto().setImageBitmap(bmp);
+            photo.setImageBitmap(bmp);
         }
-    }
-
-    public FrameLayout getRoot() {
-        return root;
-    }
-
-    public ImageView getFirstIcon() {
-        return firstIcon;
-    }
-
-    public ImageView getSecondIcon() {
-        return secondIcon;
-    }
-
-    public ImageView getThirdIcon() {
-        return thirdIcon;
-    }
-
-    public Context getCtx() {
-        return ctx;
-    }
-
-    public TextView getName() {
-        return name;
-    }
-
-    public void setName(TextView name) {
-        this.name = name;
-    }
-
-    public ImageView getPhoto() {
-        return photo;
-    }
-
-    public LinearLayout getInfoContainer() {
-        return infoContainer;
-    }
-
-    public LinearLayout getIconsContainer() {
-        return iconsContainer;
-    }
-
-    public RecyclerView getDocumentContainer() {
-        return documentContainer;
-    }
-
-    public void setDocumentContainer(RecyclerView documentContainer) {
-        this.documentContainer = documentContainer;
     }
 }

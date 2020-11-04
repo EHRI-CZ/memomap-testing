@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -13,6 +14,8 @@ import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+import com.google.android.material.button.MaterialButton;
+
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.graphql.EntityDetailQuery;
 import cz.deepvision.iti.is.graphql.EventDetailQuery;
@@ -24,6 +27,8 @@ import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.dialog.EventDialog;
 import cz.deepvision.iti.is.ui.dialog.PlaceDialog;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
+import cz.deepvision.iti.is.util.NetworkConnection;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -70,8 +75,7 @@ public class LisViewAdapter extends RecyclerView.Adapter<LisViewAdapter.ViewHold
 
     public class ViewHolder<E> extends RecyclerView.ViewHolder {
         private TextView personName;
-        private TextView showInfo;
-        private ListViewItem data;
+        private Button showInfo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,14 +88,14 @@ public class LisViewAdapter extends RecyclerView.Adapter<LisViewAdapter.ViewHold
             personName.setText(element.getLabel());
             showInfo.setOnClickListener(view -> {
                 if(element.getType().equals("entity")){
-                    VictimDialog victimDialog = new VictimDialog(fragment, true);
-                    ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-                    apolloClient.query(new EntityDetailQuery(element.getKey())).enqueue(new ApolloCall.Callback<EntityDetailQuery.Data>() {
+                    NetworkConnection.getInstance().getApolloClient().query(new EntityDetailQuery(element.getKey())).enqueue(new ApolloCall.Callback<EntityDetailQuery.Data>() {
                         @Override
                         public void onResponse(@NotNull Response<EntityDetailQuery.Data> response) {
                             if (response.data() != null && response.data().entityDetail() != null) {
                                 EntityDetailQuery.EntityDetail responseData = response.data().entityDetail();
-                                fragment.getActivity().runOnUiThread(() -> victimDialog.updateData(new Person(responseData)));
+                                Person data = new Person(responseData);
+
+                                VictimDialog victimDialog = new VictimDialog(fragment,data, true,2);
                                 victimDialog.show(fragment.getActivity().getSupportFragmentManager(), "dialog_fullscreen");
                             }
                         }
@@ -102,14 +106,14 @@ public class LisViewAdapter extends RecyclerView.Adapter<LisViewAdapter.ViewHold
                         }
                     });
                 }else if(element.getType().equals("place")){
-                    PlaceDialog placeDialog = new PlaceDialog(fragment, true);
-                    ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-                    apolloClient.query(new PlaceDetailQuery(element.getKey())).enqueue(new ApolloCall.Callback<PlaceDetailQuery.Data>() {
+                    NetworkConnection.getInstance().getApolloClient().query(new PlaceDetailQuery(element.getKey())).enqueue(new ApolloCall.Callback<PlaceDetailQuery.Data>() {
                         @Override
                         public void onResponse(@NotNull Response<PlaceDetailQuery.Data> response) {
                             if (response.data() != null && response.data().placeDetail() != null) {
                                 PlaceDetailQuery.PlaceDetail responseData = response.data().placeDetail();
-                                fragment.getActivity().runOnUiThread(() -> placeDialog.updateData(new Place(responseData)));
+                                Place data = new Place(responseData);
+
+                                PlaceDialog placeDialog = new PlaceDialog(fragment,data,true,2);
                                 placeDialog.show(fragment.getActivity().getSupportFragmentManager(), "dialog_fullscreen");
                             }
                         }
@@ -121,14 +125,15 @@ public class LisViewAdapter extends RecyclerView.Adapter<LisViewAdapter.ViewHold
                     });
                 }
                 else{
-                    EventDialog eventDialog = new EventDialog(fragment, true);
-                    ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-                    apolloClient.query(new EventDetailQuery(element.getKey())).enqueue(new ApolloCall.Callback<EventDetailQuery.Data>() {
+                    NetworkConnection.getInstance().getApolloClient().query(new EventDetailQuery(element.getKey())).enqueue(new ApolloCall.Callback<EventDetailQuery.Data>() {
                         @Override
                         public void onResponse(@NotNull Response<EventDetailQuery.Data> response) {
                             if (response.data() != null && response.data().eventDetail() != null) {
+
                                 EventDetailQuery.EventDetail responseData = response.data().eventDetail();
-                                fragment.getActivity().runOnUiThread(() -> eventDialog.updateData(new Event(responseData)));
+                                Event data = new Event(responseData);
+
+                                EventDialog eventDialog = new EventDialog(fragment, data,true,2);
                                 eventDialog.show(fragment.getActivity().getSupportFragmentManager(), "dialog_fullscreen");
                             }
                         }

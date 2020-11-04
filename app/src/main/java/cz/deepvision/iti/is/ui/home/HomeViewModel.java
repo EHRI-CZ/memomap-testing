@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,10 +36,21 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.Algorithm;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cz.deepvision.iti.is.CustomClusterManager;
 import cz.deepvision.iti.is.R;
-import cz.deepvision.iti.is.graphql.*;
+import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupQuery;
+import cz.deepvision.iti.is.graphql.EntityDetailQuery;
+import cz.deepvision.iti.is.graphql.EventDetailQuery;
+import cz.deepvision.iti.is.graphql.EventsGeoLocationGroupQuery;
+import cz.deepvision.iti.is.graphql.PlaceDetailQuery;
+import cz.deepvision.iti.is.graphql.PlacesGeoLocationGroupQuery;
 import cz.deepvision.iti.is.models.Event;
 import cz.deepvision.iti.is.models.Place;
 import cz.deepvision.iti.is.models.markers.CustomMarker;
@@ -50,13 +60,10 @@ import cz.deepvision.iti.is.models.markers.PlaceMarker;
 import cz.deepvision.iti.is.models.victims.ListViewItem;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.dialog.EventDialog;
+import cz.deepvision.iti.is.ui.dialog.ListDialog;
 import cz.deepvision.iti.is.ui.dialog.PlaceDialog;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
+import cz.deepvision.iti.is.util.NetworkConnection;
 
 public class HomeViewModel extends AndroidViewModel implements CustomClusterManager.onCameraIdleExtension, LocationListener {
 
@@ -72,6 +79,7 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
     private LocationManager mLocationManager = null;
     private Boolean[] filters = new Boolean[]{true, true, true};
     private boolean loading = false;
+    private List<CustomMarker> markerItems = new ArrayList<>();
 
     public HomeViewModel(@NonNull Application application, cz.deepvision.iti.is.models.Location position) {
         super(application);
@@ -84,63 +92,38 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
             options.tiltGesturesEnabled(false);
             options.rotateGesturesEnabled(false);
 
-            mLocationManager = (LocationManager) application.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            mLocationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
             isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             mapFragment = SupportMapFragment.newInstance(options);
 
-           /* if (isGPSEnabled){
+            if (isGPSEnabled) {
                 if (ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
                             0, this);
                     return;
                 }
-            }*/
+            }
+            mapFragment.getMapAsync(googleMap -> {
+                LatLng latLng = new LatLng(50.088780, 14.419094);
+                lastPossition = latLng;
+                if (location != null) {
+                    latLng = new LatLng(location.getLat(), location.getLng());
+                    lastPossition = latLng;
+                }else if(isGPSEnabled)
+                    updateLocalPosition(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+
+                mMap = googleMap;
+                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplication().getApplicationContext(), R.raw.map_style_dark));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPossition, 18));
+                //Cluster
+                mClusterManager = new CustomClusterManager<>(mFragment.getActivity(), googleMap);
+                mClusterManager.setmOnCameraIdleExtension(thisModel);
+                mClusterManager.setOnClusterItemClickListener(onClusterClickListener);
+                googleMap.setOnCameraIdleListener(mClusterManager);
+            });
 
         }
 
-        mapFragment.getMapAsync(googleMap -> {
-            LatLng latLng = new LatLng(50.088780, 14.419094);
-            lastPossition = latLng;
-//            Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null) {
-                latLng = new LatLng(location.getLat(), location.getLng());
-                lastPossition = latLng;
-            }
-            mMap = googleMap;
-//            mMap.setOnInfoWindowCloseListener(Marker::remove);
-//            Marker iti = googleMap.addMarker(new MarkerOptions().position(latLng).title("ITI"));
-            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplication().getApplicationContext(), R.raw.map_style_dark));
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPossition, 18));
-            //Cluster
-            mClusterManager = new CustomClusterManager<>(mFragment.getActivity(), googleMap);
-            mClusterManager.setmOnCameraIdleExtension(thisModel);
-            mClusterManager.setOnClusterItemClickListener(onClusterClickListener);
-            googleMap.setOnCameraIdleListener(mClusterManager);
-            updateMarkers(googleMap, latLng, mClusterManager.getRadius(googleMap));
-
-
-/*mClusterManager.getMarkerCollection().setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-@Override
-public View getInfoWindow(Marker marker) {
-final LayoutInflater inflater = LayoutInflater.from(mFragment.getActivity());
-final View view = inflater.inflate(R.layout.custom_info_window, null);
-final TextView textView = view.findViewById(R.id.textViewTitle);
-String text = (marker.getTitle() != null) ? marker.getTitle() : "Cluster Item";
-textView.setText(text);
-return view;
-}
-
-@Override
-public View getInfoContents(Marker marker) {
-return null;
-}
-});
-mClusterManager.getMarkerCollection().setOnInfoWindowClickListener(marker ->
-Toast.makeText(ClusteringDemoActivity.this,
-"Info window clicked.",
-Toast.LENGTH_SHORT).show());
-*/
-        });
     }
 
     final ClusterManager.OnClusterItemClickListener onClusterClickListener = new ClusterManager.OnClusterItemClickListener() {
@@ -159,16 +142,14 @@ Toast.LENGTH_SHORT).show());
         }
 
         private void previewPlace(PlaceMarker selected) {
-            PlaceDialog placeDialog = new PlaceDialog(getmFragment(), true);
-            ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-            apolloClient.query(new PlaceDetailQuery(selected.getmEntity().get(0).id())).enqueue(new ApolloCall.Callback<PlaceDetailQuery.Data>() {
+            NetworkConnection.getInstance().getApolloClient().query(new PlaceDetailQuery(selected.getmEntity().get(0).id())).enqueue(new ApolloCall.Callback<PlaceDetailQuery.Data>() {
                 @Override
                 public void onResponse(@NotNull Response<PlaceDetailQuery.Data> response) {
-                    Looper.prepare();
                     if (response.data() != null && response.data().placeDetail() != null) {
                         PlaceDetailQuery.PlaceDetail responseData = response.data().placeDetail();
                         Place data = new Place(responseData);
-                        getMapFragment().getActivity().runOnUiThread(() -> placeDialog.updateData(data));
+
+                        PlaceDialog placeDialog = new PlaceDialog(getmFragment(), data, true, 2);
                         placeDialog.show(getMapFragment().getActivity().getSupportFragmentManager(), "dialog");
 
                     }
@@ -183,43 +164,21 @@ Toast.LENGTH_SHORT).show());
 
         private void previewEvent(EventMarker selected) {
             if (selected.getmEvents().size() > 1) {
-                final BottomSheetDialog builder = new BottomSheetDialog(getmFragment().requireContext());
-                View root = LayoutInflater.from(getmFragment().requireContext()).inflate(R.layout.custom_person_list, null);
-
                 List<ListViewItem> listViewItems = new ArrayList<>();
                 for (EventsGeoLocationGroupQuery.Event event : selected.getmEvents()) {
                     listViewItems.add(new ListViewItem(event.id(), event.label(), "event"));
                 }
-                LisViewAdapter homePersonAdapter = new LisViewAdapter(listViewItems, getmFragment());
-                RecyclerView container = root.findViewById(R.id.person_list);
-                container.addItemDecoration(new DividerItemDecoration(getmFragment().getActivity(), DividerItemDecoration.VERTICAL));
-
-                container.setHasFixedSize(true);
-                container.setLayoutManager(new LinearLayoutManager(getmFragment().getContext()));
-
-                container.setAdapter(homePersonAdapter);
-                builder.setContentView(root);
-
-                if (!builder.isShowing()) builder.show();
-
-                Button button = root.findViewById(R.id.btn_close_list);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        builder.dismiss();
-                    }
-                });
+                ListDialog listDialog = new ListDialog(listViewItems, getmFragment());
+                listDialog.show(getMapFragment().getActivity().getSupportFragmentManager(), "dialog_list");
             } else {
-                EventDialog eventDialog = new EventDialog(getmFragment(), true);
-                ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-                apolloClient.query(new EventDetailQuery(selected.getmEntity().get(0).id())).enqueue(new ApolloCall.Callback<EventDetailQuery.Data>() {
+                NetworkConnection.getInstance().getApolloClient().query(new EventDetailQuery(selected.getmEntity().get(0).id())).enqueue(new ApolloCall.Callback<EventDetailQuery.Data>() {
                     @Override
                     public void onResponse(@NotNull Response<EventDetailQuery.Data> response) {
-                        Looper.prepare();
                         if (response.data() != null && response.data().eventDetail() != null) {
                             EventDetailQuery.EventDetail responseData = response.data().eventDetail();
                             Event data = new Event(responseData);
-                            getMapFragment().getActivity().runOnUiThread(() -> eventDialog.updateData(data));
+
+                            EventDialog eventDialog = new EventDialog(getmFragment(), data, true, 2);
                             eventDialog.show(getMapFragment().getActivity().getSupportFragmentManager(), "dialog");
                         }
                     }
@@ -234,44 +193,23 @@ Toast.LENGTH_SHORT).show());
 
         private void previewEntity(EntityMarker selected) {
             if (selected.getmEntity().size() > 1) {
-                final BottomSheetDialog builder = new BottomSheetDialog(getmFragment().requireContext());
-                View root = LayoutInflater.from(getmFragment().requireContext()).inflate(R.layout.custom_person_list, null);
-
                 List<ListViewItem> listViewItems = new ArrayList<>();
                 for (EntitiesGeoLocationGroupQuery.Entity entity : selected.getmEntity()) {
                     listViewItems.add(new ListViewItem(entity.id(), entity.label(), "entity"));
 
                 }
-                LisViewAdapter homePersonAdapter = new LisViewAdapter(listViewItems, getmFragment());
-                RecyclerView container = root.findViewById(R.id.person_list);
-                container.addItemDecoration(new DividerItemDecoration(getmFragment().getActivity(), DividerItemDecoration.VERTICAL));
+                ListDialog listDialog = new ListDialog(listViewItems, getmFragment());
+                listDialog.show(getMapFragment().getActivity().getSupportFragmentManager(), "dialog_list");
 
-                container.setHasFixedSize(true);
-                container.setLayoutManager(new LinearLayoutManager(getmFragment().getContext()));
-
-                container.setAdapter(homePersonAdapter);
-                builder.setContentView(root);
-
-                if (!builder.isShowing()) builder.show();
-
-                Button button = root.findViewById(R.id.btn_close_list);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        builder.dismiss();
-                    }
-                });
             } else {
-                VictimDialog victimDialog = new VictimDialog(getmFragment(), true);
-                ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-                apolloClient.query(new EntityDetailQuery(selected.getmEntity().get(0).id())).enqueue(new ApolloCall.Callback<EntityDetailQuery.Data>() {
+                NetworkConnection.getInstance().getApolloClient().query(new EntityDetailQuery(selected.getmEntity().get(0).id())).enqueue(new ApolloCall.Callback<EntityDetailQuery.Data>() {
                     @Override
                     public void onResponse(@NotNull Response<EntityDetailQuery.Data> response) {
-                        Looper.prepare();
                         if (response.data() != null && response.data().entityDetail() != null) {
                             EntityDetailQuery.EntityDetail responseData = response.data().entityDetail();
                             Person data = new Person(responseData);
-                            getMapFragment().getActivity().runOnUiThread(() -> victimDialog.updateData(data));
+
+                            VictimDialog victimDialog = new VictimDialog(getmFragment(), data, true, 2);
                             victimDialog.show(getMapFragment().getActivity().getSupportFragmentManager(), "dialog");
 
                         }
@@ -309,25 +247,22 @@ Toast.LENGTH_SHORT).show());
 
 
     public void updateMarkers(final GoogleMap googleMap, LatLng location, float radius) {
-        ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-        List<CustomMarker> markerItems = new ArrayList<>();
+        markerItems.clear();
         Boolean[] doneLoading = new Boolean[]{false, false, false};
 
         if (filters[0]) {
             //Entities groups
-            apolloClient.query(new EntitiesGeoLocationGroupQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<EntitiesGeoLocationGroupQuery.Data>() {
+            NetworkConnection.getInstance().getApolloClient().query(new EntitiesGeoLocationGroupQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<EntitiesGeoLocationGroupQuery.Data>() {
                 @Override
                 public void onResponse(@NotNull Response<EntitiesGeoLocationGroupQuery.Data> response) {
                     final List<EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup> entities = response.data().entitiesGeoLocationGroup();
                     for (EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup entity : entities) {
                         //LatLng latLng = new LatLng(entity.location().lat(), entity.location().lon());
-                        EntityMarker item = null;
-                        item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
+                        EntityMarker item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
                         markerItems.add(item);
-//                        doneLoading[0] = true;
-//                        finishLoadingMap(googleMap, doneLoading);
                     }
-                    updateMap(googleMap, markerItems);
+                    doneLoading[0] = true;
+                    finishLoadingMap(googleMap, doneLoading);
                 }
 
                 @Override
@@ -339,7 +274,7 @@ Toast.LENGTH_SHORT).show());
 
         if (filters[1]) {
             //Events
-            apolloClient.query(new EventsGeoLocationGroupQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<EventsGeoLocationGroupQuery.Data>() {
+            NetworkConnection.getInstance().getApolloClient().query(new EventsGeoLocationGroupQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<EventsGeoLocationGroupQuery.Data>() {
                 @Override
                 public void onResponse(@NotNull Response<EventsGeoLocationGroupQuery.Data> response) {
                     final List<EventsGeoLocationGroupQuery.EventsGeoLocationGroup> events = response.data().eventsGeoLocationGroup();
@@ -347,9 +282,8 @@ Toast.LENGTH_SHORT).show());
                         EventMarker item = new EventMarker(event.location().lat(), event.location().lon(), event.events(), null, R.drawable.ic_event_map);
                         markerItems.add(item);
                     }
-//                            doneLoading[1] = true;
-//                            finishLoadingMap(googleMap, doneLoading);
-                    updateMap(googleMap, markerItems);
+                    doneLoading[1] = true;
+                    finishLoadingMap(googleMap, doneLoading);
 
                 }
 
@@ -362,7 +296,7 @@ Toast.LENGTH_SHORT).show());
 
         if (filters[2]) {
             //Places
-            apolloClient.query(new PlacesGeoLocationGroupQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<PlacesGeoLocationGroupQuery.Data>() {
+            NetworkConnection.getInstance().getApolloClient().query(new PlacesGeoLocationGroupQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<PlacesGeoLocationGroupQuery.Data>() {
                 @Override
                 public void onResponse(@NotNull final Response<PlacesGeoLocationGroupQuery.Data> response) {
                     final List<PlacesGeoLocationGroupQuery.PlacesGeoLocationGroup> places = response.data().placesGeoLocationGroup();
@@ -370,9 +304,8 @@ Toast.LENGTH_SHORT).show());
                         PlaceMarker item = new PlaceMarker(place.location().lat(), place.location().lon(), place.places(), null, R.drawable.ic_place_map);
                         markerItems.add(item);
                     }
-//                            doneLoading[2] = true;
-//                            finishLoadingMap(googleMap, doneLoading);
-                    updateMap(googleMap, markerItems);
+                    doneLoading[2] = true;
+                    finishLoadingMap(googleMap, doneLoading);
                 }
 
                 @Override
@@ -385,24 +318,17 @@ Toast.LENGTH_SHORT).show());
 
     private void updateMap(GoogleMap googleMap, List<CustomMarker> markerItems) {
         if (mFragment != null && mFragment.getActivity() != null) {
-
             mFragment.getActivity().runOnUiThread(() -> {
                 googleMap.clear();
-//                removeMarkerse();
                 mClusterManager.clearItems();
                 mClusterManager.addItems(markerItems);
                 mClusterManager.cluster();
+                loading = false;
             });
         }
     }
 
-    private synchronized void removeMarkerse() {
-        for (Marker marker : mClusterManager.getClusterMarkerCollection().getMarkers()) {
-            marker.remove();
-        }
-    }
-
-   /* private void finishLoadingMap(GoogleMap googleMap, Boolean[] doneLoading) {
+    private void finishLoadingMap(GoogleMap googleMap, Boolean[] doneLoading) {
         for (int i = 0; i < filters.length; i++) {
             Log.e("Filters", "position: " + i + " " + filters[i]);
         }
@@ -411,16 +337,9 @@ Toast.LENGTH_SHORT).show());
         }
         if (filters[0] == doneLoading[0] && filters[1] == doneLoading[1] && filters[2] == doneLoading[2] && !loading) {
             loading = true;
-            mFragment.getActivity().runOnUiThread(() -> {
-                googleMap.clear();
-                mClusterManager.clearItems();
-                mClusterManager.addItems(markerItems);
-                mClusterManager.
-                mClusterManager.cluster();
-                loading = false;
-            });
+            updateMap(googleMap, markerItems);
         }
-    }*/
+    }
 
     public void setUpMapUpdateListener() {
         if (isGPSEnabled)
@@ -437,7 +356,7 @@ Toast.LENGTH_SHORT).show());
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-//        updateLocalPosition(location);
+        updateLocalPosition(location);
     }
 
 
@@ -462,17 +381,20 @@ Toast.LENGTH_SHORT).show());
     }
 
 
-//    private void updateLocalPosition(Location location) {
-//        Log.d("IS", "CAMERA IDLE");
-//        float zoom = mMap.getCameraPosition().zoom;
-//        LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-//        float radius = getRadius(mMap);
-//        if (!lastPossition.equals(current)) {
-//            Log.d("IS", "POSITION CHANGED " + lastPossition + " new " + current);
-//            updateMarkers(mMap, current, radius);
-//            lastPossition = current;
-//        }
-//    }
+    private void updateLocalPosition(Location location) {
+        if (mMap != null) {
+            Log.d("IS", "User location");
+            float zoom = mMap.getCameraPosition().zoom;
+            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+            float radius = mClusterManager.getRadius(mMap);
+            if (!lastPossition.equals(current)) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPossition, 18));
+                Log.d("IS", "POSITION CHANGED " + lastPossition + " new " + current);
+                updateMarkers(mMap, current, radius);
+                lastPossition = current;
+            }
+        }
+    }
 
     public GoogleMap getmMap() {
         return mMap;

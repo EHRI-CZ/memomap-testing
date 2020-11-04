@@ -21,7 +21,7 @@ public class LayoutGenerator {
     public static void addInfo(LinearLayout infoContainer, String s) {
         TextView info = new TextView(ctx);
         info.setText(s);
-        info.setTextSize(15);
+        info.setTextSize(12);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             info.setLineHeight(50);
         }

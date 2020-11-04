@@ -50,7 +50,6 @@ public class CustomClusterManager<M> extends ClusterManager {
     @Override
     public void onCameraIdle() {
         super.onCameraIdle();
-        //Toast.makeText(mapFragment.getContext(),"Current zoom:"+zoom+" location:"+current + " radius:"+radius,Toast.LENGTH_LONG).show();
         mOnCameraIdleExtension.onCameraIdle();
     }
 
@@ -123,58 +122,33 @@ public class CustomClusterManager<M> extends ClusterManager {
         }
 
         private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes CustomMarker item) {
-            double resize = 1.5;
+            double resize = 1.75;
 
             Drawable iconDrawable = ContextCompat.getDrawable(context, item.getIcon());
-            iconDrawable.setBounds(50, 50, (int) (iconDrawable.getIntrinsicWidth() / resize), (int) (iconDrawable.getIntrinsicHeight() / resize));
-            Bitmap icon = Bitmap.createBitmap((int) (iconDrawable.getIntrinsicWidth() / resize), (int) (iconDrawable.getIntrinsicHeight() / resize), Bitmap.Config.ARGB_8888);
+            iconDrawable.setBounds(0, 0, (int) (iconDrawable.getIntrinsicWidth() / resize), (int) (iconDrawable.getIntrinsicHeight() / resize));
 
-            Bitmap bmp = Bitmap.createBitmap(400, 400, Bitmap.Config.ARGB_8888);
-
+            Bitmap bmp = Bitmap.createBitmap((int) (iconDrawable.getIntrinsicWidth() / resize), (int)(iconDrawable.getIntrinsicHeight() / resize), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bmp);
 
-            Drawable bubbleDrawable = ContextCompat.getDrawable(ctx, R.drawable.ic_baseline_chat_bubble_96);
-            bubbleDrawable.setBounds(0, 0, bubbleDrawable.getIntrinsicWidth() / 2, bubbleDrawable.getIntrinsicHeight() / 2);
-            Bitmap bubble = Bitmap.createBitmap(bubbleDrawable.getIntrinsicWidth() / 2, bubbleDrawable.getIntrinsicHeight() / 2, Bitmap.Config.ARGB_8888);
-
-            canvas.translate(0,iconDrawable.getIntrinsicHeight());
             iconDrawable.draw(canvas);
 
             if (item.getmEntity().size() > 1) {
                 Paint paint = new Paint();
-                paint.setColor(Color.BLACK);
-                paint.setTextSize(35);
-                canvas.translate(iconDrawable.getIntrinsicWidth()/2, -bubbleDrawable.getIntrinsicHeight());
-                bubbleDrawable.draw(canvas);
-                canvas.translate(80, 90);
 
-                canvas.drawText(String.valueOf(item.getmEntity().size()), 0, 0, paint);
+                Rect clipBounds = canvas.getClipBounds();
+                int cHeight = clipBounds.height();
+                int cWidth = clipBounds.width();
+
+                String text = String.valueOf(item.getmEntity().size());
+                paint.setColor(Color.WHITE);
+                paint.setTextSize(25);
+                paint.setTextAlign(Paint.Align.LEFT);
+                paint.getTextBounds(text, 0, text.length(), clipBounds);
+                float x = cWidth / 2f - clipBounds.width() / 2f - clipBounds.left;
+                float y = cHeight / 1.2f;
+                canvas.drawText(text, x, y, paint);
             }
             return BitmapDescriptorFactory.fromBitmap(bmp);
-        }
-
-        private void drawBubble(Canvas canvas, int size) {
-
-            /*Paint paint = new Paint();
-            paint.setColor(Color.WHITE);
-            canvas.drawBitmap(bitmap,0,0,paint);
-            String text = String.valueOf(size);
-
-            Paint textPaint = new Paint();
-            textPaint.setTextSize(30);
-            textPaint.setTextAlign(Paint.Align.LEFT);
-            textPaint.setStyle(Paint.Style.FILL);
-            textPaint.setColor(Color.BLACK);
-
-            Rect r = new Rect();
-            textPaint.getTextBounds(text, 0, text.length(), r);
-
-            r = canvas.getClipBounds();
-            RectF bounds = new RectF(r);
-            bounds.right = textPaint.measureText(text, 0, text.length());
-            bounds.left += (r.width() - bounds.right) / 2.0f;
-            canvas.drawText(text, bounds.left, 25, textPaint);*/
-
         }
     }
 }

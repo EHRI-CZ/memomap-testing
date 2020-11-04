@@ -1,14 +1,18 @@
 package cz.deepvision.iti.is.ui.dialog;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Place;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
@@ -19,19 +23,19 @@ import static cz.deepvision.iti.is.util.LayoutGenerator.addInfo;
 public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<Place> {
     private Place data;
 
-    public PlaceDialog() {
-    }
 
-    public PlaceDialog(@NonNull Fragment fragment, boolean small) {
-        super(fragment.requireContext(), small);
-        this.fragment = fragment;
-    }
-
-    public PlaceDialog(@NonNull Context context, boolean small, Place data, Fragment fragment) {
-        super(context, small);
-        this.fragment = fragment;
+    public PlaceDialog(@NonNull Fragment inputFragment, Place data, boolean small, int style) {
+        super(inputFragment, small, style);
+        this.fragment = inputFragment;
         this.data = data;
     }
+
+    public PlaceDialog(@NonNull Fragment inputFragment, Place data, int style) {
+        super(inputFragment, false, style);
+        this.fragment = inputFragment;
+        this.data = data;
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,72 +56,88 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
 
     private void updateUI() {
         if (data != null) {
+            name.setText(data.getLabel());
             String imageUrl = "";
-            getName().setText(data.getLabel());
             if (isSmallDialog()) {
-                getFirstIcon().setOnClickListener(view -> {
-                    dismiss();
-                    PlaceDialog placeDialog = new PlaceDialog(getCtx(), false, data, fragment);
-                    placeDialog.show(fragment.getActivity().getSupportFragmentManager(), "dialog_fullscreen");
+                firstIcon.setOnClickListener(icon -> {
+                    icon.animate().setDuration(200).rotationBy(360).alpha(0).setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            dismiss();
+                            PlaceDialog placeDialog = new PlaceDialog(fragment, data, false, 2);
+                            placeDialog.show(fragment.getActivity().getSupportFragmentManager(), "dialog_fullscreen");
+                        }
+                    });
                 });
                 if (data.getPreview() != null) imageUrl = data.getPreview();
-                addInfo(getInfoContainer(), data.getDescription().substring(0, data.getDescription().length() / 2) + "...");
+                addInfo(infoContainer, data.getDescription().substring(0, data.getDescription().length() / 2) + "...");
             } else {
                 if (data.getDocumentList().size() > 0) {
                     DocumentAdapter documentAdapter = new DocumentAdapter(data.getDocumentList(), fragment);
-                    getDocumentContainer().setHasFixedSize(true);
-                    getDocumentContainer().setAdapter(documentAdapter);
-                } else getDocumentContainer().setVisibility(View.GONE);
+                    documentContainer.setHasFixedSize(true);
+                    documentContainer.setAdapter(documentAdapter);
+                } else documentContainer.setVisibility(View.GONE);
                 if (data.getFull() != null) imageUrl = data.getFull();
-                addInfo(getInfoContainer(), data.getDescription());
+                addInfo(infoContainer, data.getDescription());
                 changeLayoutConstrains();
-                getFirstIcon().setOnClickListener(v -> {
-                    if (data.getLocation() != null) showDataOnMap(data.getLocation());
-                });
+
                 if (data.getLocation() == null) {
-                    getFirstIcon().setEnabled(false);
-                    getFirstIcon().setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_menu_map_grayed));
+                    firstIcon.setEnabled(false);
+                    firstIcon.setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_menu_map_grayed));
+                }else{
+                    firstIcon.setOnClickListener(icon -> {
+                        icon.animate().setDuration(200).rotationBy(360).alpha(0).setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                showDataOnMap(data.getLocation());
+                                dismiss();
+                            }
+                        });
+                    });
                 }
             }
-            getSecondIcon().setOnClickListener(v -> {
+            secondIcon.setOnClickListener(v -> {
                 if (data.getLocation() != null) updateDataOnMap(data.getLocation());
             });
             if (data.getLocation() == null) {
-                getSecondIcon().setEnabled(false);
-                getSecondIcon().setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_navigate_grayed));
+                secondIcon.setEnabled(false);
+                secondIcon.setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_navigate_grayed));
             }
 
             if (!imageUrl.equals("")) {
                 Requester requester = new Requester(getActivity(), this);
                 requester.makeRequest(imageUrl);
-            } else getPhoto().setImageDrawable(getActivity().getDrawable(R.drawable.ic_baseline_home_96));
+            } else
+                photo.setImageDrawable(getActivity().getDrawable(R.drawable.ic_baseline_home_96));
 
 
         }
     }
 
     private void changeLayoutConstrains() {
-        ConstraintLayout.LayoutParams photoParams = (ConstraintLayout.LayoutParams) getPhoto().getLayoutParams();
-        photoParams.rightToRight = getRoot().getId();
-        photoParams.leftToLeft = getRoot().getId();
+        ConstraintLayout.LayoutParams photoParams = (ConstraintLayout.LayoutParams) photo.getLayoutParams();
+        photoParams.rightToRight = root.getId();
+        photoParams.leftToLeft = root.getId();
         photoParams.leftMargin = 0;
         photoParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         photoParams.height = 400;
-        getPhoto().setLayoutParams(photoParams);
+        photo.setLayoutParams(photoParams);
 
-        ConstraintLayout.LayoutParams textParams = (ConstraintLayout.LayoutParams) getInfoContainer().getLayoutParams();
-        textParams.leftToLeft = getRoot().getId();
-        textParams.rightToRight = getRoot().getId();
-        textParams.topToBottom = getPhoto().getId();
+        ConstraintLayout.LayoutParams textParams = (ConstraintLayout.LayoutParams) infoContainer.getLayoutParams();
+        textParams.leftToLeft = root.getId();
+        textParams.rightToRight = root.getId();
+        textParams.topToBottom = photo.getId();
         textParams.topToTop = -1;
         textParams.topMargin = 8;
         textParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         textParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        getInfoContainer().setLayoutParams(textParams);
+        infoContainer.setLayoutParams(textParams);
 
-        ConstraintLayout.LayoutParams documentParams = (ConstraintLayout.LayoutParams) getDocumentContainer().getLayoutParams();
-        documentParams.topToBottom = getInfoContainer().getId();
-        getDocumentContainer().setLayoutParams(documentParams);
+        ConstraintLayout.LayoutParams documentParams = (ConstraintLayout.LayoutParams) documentContainer.getLayoutParams();
+        documentParams.topToBottom = infoContainer.getId();
+        documentContainer.setLayoutParams(documentParams);
 
 
     }
@@ -126,4 +146,5 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
     public void updateData(Place data) {
         this.data = data;
     }
+
 }

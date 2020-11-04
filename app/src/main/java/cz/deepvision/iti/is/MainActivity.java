@@ -1,8 +1,10 @@
 package cz.deepvision.iti.is;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -13,10 +15,12 @@ import android.view.*;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -24,17 +28,26 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+
 import cz.deepvision.iti.is.graphql.SearchByFullTextQuery;
 import cz.deepvision.iti.is.models.DataGenerator;
 import cz.deepvision.iti.is.models.victims.ListViewItem;
+import cz.deepvision.iti.is.ui.dialog.ListDialog;
+import cz.deepvision.iti.is.ui.events.EventsFragment;
+import cz.deepvision.iti.is.ui.home.HomeFragment;
 import cz.deepvision.iti.is.ui.home.LisViewAdapter;
+import cz.deepvision.iti.is.ui.places.PlacesFragment;
+import cz.deepvision.iti.is.ui.victims.VictimsFragment;
+import cz.deepvision.iti.is.util.NetworkConnection;
 import io.realm.BuildConfig;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
         progressBar = findViewById(R.id.search_progress_bar);
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(R.id.navigation_home, R.id.navigation_victims, R.id.navigation_places, R.id.navigation_events, R.id.navigation_about).build();
@@ -71,6 +85,11 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.top_nav_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
+        for (int i = 0; i < menu.size(); i++) {
+            menu.getItem(i).setTitle("Zadejte text");
+
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -85,60 +104,53 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public boolean onQueryTextChange(String text) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    mHandler.removeCallbacksAndMessages(null);
-                    mHandler.postDelayed(() -> {
-                        progressBar.setVisibility(View.INVISIBLE);
-                        showList(text);
-                    }, 1000);
+                    if (!text.isEmpty()) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        mHandler.removeCallbacksAndMessages(null);
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                showList(text);
+                                mHandler.removeCallbacks(this);
+                            }
+                        }, 1500);
+                    }
                     return true;
                 }
-
-                ;
             });
         }
         return true;
     }
 
     private void showList(String text) {
-        ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
-        apolloClient.query(new SearchByFullTextQuery(text)).enqueue(new ApolloCall.Callback<SearchByFullTextQuery.Data>() {
+        NetworkConnection.getInstance().getApolloClient().query(new SearchByFullTextQuery(text)).enqueue(new ApolloCall.Callback<SearchByFullTextQuery.Data>() {
             @Override
             public void onResponse(@NotNull Response<SearchByFullTextQuery.Data> response) {
-                Looper.prepare();
-                if (response.data() != null && response.data().fullText() != null) {
+                if (Looper.myLooper() == null)
+                    Looper.prepare();
+                if (response.data() != null && response.data().fullText().size() > 0) {
                     runOnUiThread(() -> {
-                        builder = new BottomSheetDialog(ctx);
-                        View root = LayoutInflater.from(ctx).inflate(R.layout.custom_person_list, null);
+
+                        Fragment myFragment = (Fragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment).getChildFragmentManager().getPrimaryNavigationFragment();
                         List<ListViewItem> listViewItems = new ArrayList<>();
-                        final String simpleName = getSupportFragmentManager().getPrimaryNavigationFragment().getChildFragmentManager().getFragments().get(0).getClass().getSimpleName();
+
                         for (SearchByFullTextQuery.FullText fullText : response.data().fullText()) {
-                            if (simpleName.equals("VictimsFragment") && fullText.type().equals("entity"))
+                            if (myFragment instanceof VictimsFragment && fullText.type().equals("entity"))
                                 listViewItems.add(new ListViewItem(fullText.id(), fullText.label(), fullText.type()));
-                            else if (simpleName.equals("PlacesFragment") && fullText.type().equals("place"))
-                                 listViewItems.add(new ListViewItem(fullText.id(), fullText.label(), fullText.type()));
-                            else if (simpleName.equals("EventsFragment") && fullText.type().equals("event"))
+                            else if (myFragment instanceof PlacesFragment && fullText.type().equals("place"))
                                 listViewItems.add(new ListViewItem(fullText.id(), fullText.label(), fullText.type()));
-                            else if(simpleName.equals("HomeFragment")){
+                            else if (myFragment instanceof EventsFragment && fullText.type().equals("event"))
+                                listViewItems.add(new ListViewItem(fullText.id(), fullText.label(), fullText.type()));
+                            else if (myFragment instanceof HomeFragment) {
                                 listViewItems.add(new ListViewItem(fullText.id(), fullText.label(), fullText.type()));
                             }
                         }
-                        LisViewAdapter lisViewAdapter = new LisViewAdapter(listViewItems, getSupportFragmentManager().getPrimaryNavigationFragment());
-                        RecyclerView container = root.findViewById(R.id.person_list);
-                        container.addItemDecoration(new DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL));
-
-                        container.setHasFixedSize(true);
-                        container.setLayoutManager(new LinearLayoutManager(ctx));
-
-                        container.setAdapter(lisViewAdapter);
-                        builder.setContentView(root);
-
-                        if (listViewItems.size() > 0) if (!builder.isShowing()) builder.show();
-
-                        Button button = root.findViewById(R.id.btn_close_list);
-                        button.setOnClickListener(view -> builder.dismiss());
+                        ListDialog listDialog = new ListDialog(listViewItems,myFragment);
+                        listDialog.show(getSupportFragmentManager(), "dialog_list");
                     });
-                } else Toast.makeText(ctx, "Nebyli nalazeny žádné výsledky", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(ctx, "Nebyli nalazeny žádné výsledky", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.INVISIBLE);
             }
 
             @Override
@@ -152,12 +164,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_SEND)) {
-                builder.dismiss();
+                if (builder != null)
+                    builder.dismiss();
                 Bundle bundle = new Bundle();
-                bundle.putDoubleArray("location",intent.getDoubleArrayExtra("location"));
+                bundle.putDoubleArray("location", intent.getDoubleArrayExtra("location"));
                 Log.d("Broadcast", "arriaved");
                 NavController navController = Navigation.findNavController((Activity) ctx, R.id.nav_host_fragment);
-                navController.navigate(R.id.navigation_home,bundle);
+                navController.navigate(R.id.navigation_home, bundle);
             }
         }
     };

@@ -45,12 +45,14 @@ public class Person extends RealmObject {
                             event.type().equals("residence_before_deportation") ||
                             event.type().equals("residence_registration")) {
                         Event personEvent = new Event(event);
+
                         if (personEvent.type.equals("birth"))
                             born = personEvent.date;
-                        else if (personEvent.type.equals("death")) {
-                            death = personEvent.getDate() != null ? personEvent.getDate() : "";
+                        else if (personEvent.type.equals("death")){
+                            deathPlace += personEvent.getDate() != null ? personEvent.getDate() : "";
                             deathPlace = personEvent.getPlace() != null ? personEvent.getPlace() : "";
-                        } else
+                        }
+                        else
                             eventList.add(personEvent);
                     }
                 }

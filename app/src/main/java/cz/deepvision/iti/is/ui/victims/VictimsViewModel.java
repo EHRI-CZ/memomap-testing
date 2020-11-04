@@ -11,6 +11,8 @@ import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.maps.model.LatLng;
 import cz.deepvision.iti.is.graphql.EntitiesGeoListLimitedQuery;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
+import cz.deepvision.iti.is.util.NetworkConnection;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -41,7 +43,6 @@ public class VictimsViewModel extends ViewModel {
     }
 
     public void loadData(){
-        ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
         LatLng location = new LatLng(50.088780, 14.419094);
         int radius = 150;
         if(mOffset>0) radius = 150 * (mOffset/24);
@@ -50,7 +51,7 @@ public class VictimsViewModel extends ViewModel {
         }
         // TODO : Zobrazení vícero osob, data takhle přijdou, takže chyba buď GRAPHQL, nebo ITI
         // TODO : Limit nefunguje s větším radiusem přijde záznamů více
-        apolloClient.query(new EntitiesGeoListLimitedQuery(location.longitude,location.latitude,(int)radius,mOffset,24))
+        NetworkConnection.getInstance().getApolloClient().query(new EntitiesGeoListLimitedQuery(location.longitude,location.latitude,(int)radius,mOffset,24))
                 .enqueue(new ApolloCall.Callback<EntitiesGeoListLimitedQuery.Data>() {
                     @Override
                     public void onResponse(@NotNull final Response<EntitiesGeoListLimitedQuery.Data> response) {

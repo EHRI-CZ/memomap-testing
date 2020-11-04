@@ -21,11 +21,9 @@ import static cz.deepvision.iti.is.util.LayoutGenerator.addInfo;
 public class DocumentDialog extends DefaultDialog implements DefaultDialog.Updater<Document> {
     private Document data;
 
-    public DocumentDialog() {
-    }
 
     public DocumentDialog(@NonNull Fragment inputFragment,Document data) {
-        super(inputFragment.requireContext(), false);
+        super(inputFragment, false);
         this.data = data;
         fragment = inputFragment;
     }
@@ -49,33 +47,12 @@ public class DocumentDialog extends DefaultDialog implements DefaultDialog.Updat
 
     private void updateUI() {
         if (data != null) {
+            firstIcon.setVisibility(View.GONE);
+            secondIcon.setVisibility(View.GONE);
+            name.setText(data.getName());
+            addInfo(infoContainer, "Oběti šoa, jejichž se dokument týká:" + data.getName());
             Requester requester = new Requester(fragment.getActivity());
-            requester.makeRequestForAdapter(data.getFullImage(), getPhoto());
-            getFirstIcon().setVisibility(View.GONE);
-            getSecondIcon().setVisibility(View.GONE);
-            getName().setText(data.getName());
-            addInfo(getInfoContainer(), "Oběti šoa, jejichž se dokument týká:" + data.getName());
-            getPhoto().setOnClickListener(view -> {
-                if (isImageFitToScreen) {
-                    isImageFitToScreen = false;
-                    hideUI(View.VISIBLE);
-                    getPhoto().setLayoutParams(new ConstraintLayout.LayoutParams(300, 300));
-                    ConstraintLayout.LayoutParams photoParams = (ConstraintLayout.LayoutParams) getPhoto().getLayoutParams();
-                    photoParams.topToBottom = getName().getId();
-                    photoParams.topMargin = 16;
-                    getPhoto().setLayoutParams(photoParams);
-                } else {
-                    isImageFitToScreen = true;
-                    hideUI(View.INVISIBLE);
-                    getPhoto().setLayoutParams(new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                    getPhoto().setScaleType(ImageView.ScaleType.FIT_CENTER);
-                }
-
-                AutoTransition transition = new AutoTransition();
-                transition.setDuration(150);
-                transition.setInterpolator(new AccelerateDecelerateInterpolator());
-                TransitionManager.beginDelayedTransition(getRoot(), transition);
-            });
+            requester.makeRequestForAdapter(data.getFullImage(), photo);
         }
     }
 

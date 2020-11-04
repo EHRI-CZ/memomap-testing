@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#009688"
     tools:context=".ui.home.HomeFragment">
 
     <FrameLayout
@@ -12,7 +11,6 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,8 +22,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/black"
-        app:isb_indicator_color="@color/colorPrimary"
-        app:isb_indicator_text_color="@color/colorAccent"
         app:isb_indicator_text_size="18sp"
         app:isb_max="100"
         app:isb_min="-100"
@@ -40,12 +36,12 @@
         app:isb_tick_marks_color="@color/iti_orange_faded"
         app:isb_tick_marks_size="13dp"
         app:isb_tick_texts_array="@array/years"
-        app:isb_tick_texts_color="@color/colorAccent"
+        app:isb_tick_texts_color="@color/white"
         app:isb_tick_texts_size="15sp"
         app:isb_ticks_count="7"
         app:isb_track_background_color="@color/white"
         app:isb_track_background_size="2dp"
-        app:isb_track_progress_color="@color/white"
+        app:isb_track_progress_color="@color/iti_orange"
         app:isb_track_progress_size="4dp"
         app:layout_constraintBottom_toTopOf="@id/check_group"
         app:layout_constraintEnd_toEndOf="parent"
@@ -70,7 +66,7 @@
             android:buttonTint="@color/iti_orange"
             android:checked="true"
             android:text="@string/title_victims"
-            android:textColor="@color/colorAccent" />
+            android:textColor="@color/iti_orange" />
 
         <CheckBox
             android:id="@+id/checkBoxEvents"
@@ -80,7 +76,7 @@
             android:buttonTint="@color/iti_orange"
             android:checked="true"
             android:text="@string/title_events"
-            android:textColor="@color/colorAccent" />
+            android:textColor="@color/iti_orange" />
 
         <CheckBox
             android:id="@+id/checkBoxPlaces"
@@ -90,7 +86,7 @@
             android:buttonTint="@color/iti_orange"
             android:checked="true"
             android:text="@string/title_places"
-            android:textColor="@color/colorAccent" />
+            android:textColor="@color/iti_orange" />
     </LinearLayout>
 
     <TextView
