@@ -61,24 +61,10 @@ public class EventsFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (itemList.size() <= 20) {
-                    itemList.add(null);
-                    adapter.notifyItemInserted(itemList.size() - 1);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-//                            itemList.remove(itemList.size() - 1);
-//                            adapter.notifyItemRemoved(itemList.size());
-                            //LOAD DATA
-                            eventsViewModel.loadData();
-                            adapter.notifyDataSetChanged();
-                        }
-                    }, 5000);
-                } else {
-                    eventsViewModel.loadData();
-                    adapter.notifyDataSetChanged();
-                    button.setVisibility(View.GONE);
-                }
+                eventsViewModel.loadData();
+                adapter.notifyDataSetChanged();
+                button.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -88,8 +74,6 @@ public class EventsFragment extends Fragment {
                 Log.d("IS", "Items changed");
                 itemList.addAll(victimListItems);
                 adapter.notifyDataSetChanged();
-                if (itemList.size() > 23)
-                    Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
@@ -107,6 +91,7 @@ public class EventsFragment extends Fragment {
             public void showButton() {
                 startAnimation(container, View.VISIBLE);
             }
+
             private void startAnimation(ViewGroup root, int visibility) {
                 Transition transition = new Slide(Gravity.BOTTOM);
                 transition.setDuration(600);
@@ -124,14 +109,13 @@ public class EventsFragment extends Fragment {
         super.onStart();
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
-        DividerItemDecoration horizontalDecoration = new DividerItemDecoration(getContext(),
-                DividerItemDecoration.VERTICAL);
-        Drawable horizontalDivider = ContextCompat.getDrawable(getActivity(), R.drawable.divider);
-        horizontalDecoration.setDrawable(horizontalDivider);
-        recyclerView.addItemDecoration(horizontalDecoration);
+//        DividerItemDecoration horizontalDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+//        Drawable horizontalDivider = ContextCompat.getDrawable(getActivity(), R.drawable.divider);
+//        horizontalDecoration.setDrawable(horizontalDivider);
+//        recyclerView.addItemDecoration(horizontalDecoration);
     }
 
-    public Paint getPaint(int color){
+    public Paint getPaint(int color) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(color);
         paint.setStyle(Paint.Style.STROKE);
@@ -139,6 +123,7 @@ public class EventsFragment extends Fragment {
 
         return paint;
     }
+
     @Override
     public void onStop() {
         super.onStop();

@@ -25,7 +25,7 @@ public class EventsViewModel extends ViewModel {
     private MutableLiveData<String> mText;
     private MutableLiveData<List<RecordListItem>> mItems;
     private int mOffset;
-    private static int number = 1;
+    private int number = 1;
 
     public EventsViewModel() {
         mText = new MutableLiveData<>();
@@ -47,24 +47,14 @@ public class EventsViewModel extends ViewModel {
     public void loadData() {
         LatLng location = new LatLng(50.0853034, 14.4276448);
         int radius = 150;
-        if (mOffset > 0) radius = 150 * (mOffset / 24);
-        if (mOffset == 0) {
-            number = 1;
-        }
-        // TODO : Zobrazení vícero osob, data takhle přijdou, takže chyba buď GRAPHQL, nebo ITI
-        // TODO : Limit nefunguje s větším radiusem přijde záznamů více
+        if (mOffset > 0) radius += radius;
+
         NetworkConnection.getInstance().getApolloClient().query(new EventsGeoListLimitedQuery(location.longitude, location.latitude, (int) radius, mOffset, 24))
                 .enqueue(new ApolloCall.Callback<EventsGeoListLimitedQuery.Data>() {
             @Override
             public void onResponse(@NotNull final Response<EventsGeoListLimitedQuery.Data> response) {
                 List<RecordListItem> items = new ArrayList<>();
                 if (response.data() != null) {
-                    /*if (response.data().eventsGeoListLimited() != null) {
-                        if (response.data().eventsGeoListLimited().size() == 0) {
-                            radius[0] += 150;
-                            loadData();
-                        }
-                    }*/
                     for (EventsGeoListLimitedQuery.EventsGeoListLimited dbItem : response.data().eventsGeoListLimited()) {
                         RecordListItem item = new RecordListItem();
                         item.setLabel(number + ":" + dbItem.event_label());
@@ -74,7 +64,7 @@ public class EventsViewModel extends ViewModel {
                         number++;
                     }
                     mItems.postValue(items);
-                    mOffset += 24;
+                    mOffset += response.data().eventsGeoListLimited().size();
                 }
             }
                 @Override public void onFailure (@NotNull ApolloException e){

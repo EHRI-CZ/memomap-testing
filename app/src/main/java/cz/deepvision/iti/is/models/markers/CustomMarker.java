@@ -6,26 +6,30 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+import java.util.Date;
 import java.util.List;
 
 public class CustomMarker<T> implements ClusterItem {
     private final LatLng mPosition;
     private List<T> mEntity;
     private String mSnippet;
+    private boolean visible;
     public final int icon;
 
-    public CustomMarker(double lat, double lng, int iconRes) {
+    public CustomMarker(double lat, double lng, int iconRes, boolean visible) {
         mPosition = new LatLng(lat, lng);
         mEntity = null;
         mSnippet = null;
         icon = iconRes;
+        this.visible = visible;
     }
 
-    public CustomMarker(double lat, double lng, List<T> entityList, String snippet, int iconRes) {
+    public CustomMarker(double lat, double lng, List<T> entityList, String snippet, int iconRes, boolean visible) {
         mPosition = new LatLng(lat, lng);
         mEntity = entityList;
         mSnippet = snippet;
         icon = iconRes;
+        this.visible = visible;
     }
 
     public LatLng getmPosition() {
@@ -52,6 +56,13 @@ public class CustomMarker<T> implements ClusterItem {
         return icon;
     }
 
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 
     @NonNull
     @Override

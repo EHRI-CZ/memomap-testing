@@ -69,10 +69,6 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.showButton();
                     }
-                } else if (totalItemCount < 23) {
-                    if (onLoadMoreListener != null) {
-                        onLoadMoreListener.showButton();
-                    }
                 } else if (lastVisibleItem < totalItemCount - 5)
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.hideButton();
@@ -99,7 +95,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return new EventsAdapter.ItemViewHolder(view);
         } else if (viewType == VIEW_TYPE_LOADING) {
             View view = LayoutInflater.from(activity).inflate(R.layout.item_loading, parent, false);
-            return new EventsAdapter.LoadingViewHolder(view);
+            return new LoadingViewHolder(view);
         }
         return null;
     }
@@ -201,7 +197,7 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    class LoadingViewHolder extends RecyclerView.ViewHolder {
+    static class LoadingViewHolder extends RecyclerView.ViewHolder {
         public ProgressBar progressBar;
 
         public LoadingViewHolder(View view) {

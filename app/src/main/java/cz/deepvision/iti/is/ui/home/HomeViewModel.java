@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +41,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.Algorithm;
 
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.CDATASection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,8 @@ import java.util.List;
 import cz.deepvision.iti.is.CustomClusterManager;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupQuery;
+import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupWithTransportsQuery;
+import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupWithTransportsQuery.EntitiesGeoLocationGroupWithTransport;
 import cz.deepvision.iti.is.graphql.EntityDetailQuery;
 import cz.deepvision.iti.is.graphql.EventDetailQuery;
 import cz.deepvision.iti.is.graphql.EventsGeoLocationGroupQuery;
@@ -67,6 +72,7 @@ import cz.deepvision.iti.is.util.NetworkConnection;
 
 public class HomeViewModel extends AndroidViewModel implements CustomClusterManager.onCameraIdleExtension, LocationListener {
 
+    private LocationManager mLocationManager;
     private MutableLiveData<String> mText;
     private CustomClusterManager<CustomMarker> mClusterManager;
 
@@ -75,10 +81,10 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
     private HomeViewModel thisModel = this;
     private GoogleMap mMap;
     private LatLng lastPossition = new LatLng(50.088780, 14.419094);
-    private boolean isGPSEnabled = false;
-    private LocationManager mLocationManager = null;
     private Boolean[] filters = new Boolean[]{true, true, true};
     private boolean loading = false;
+    private int year = 0;
+    private int month = 0;
     private List<CustomMarker> markerItems = new ArrayList<>();
 
     public HomeViewModel(@NonNull Application application, cz.deepvision.iti.is.models.Location position) {
@@ -92,26 +98,18 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
             options.tiltGesturesEnabled(false);
             options.rotateGesturesEnabled(false);
 
-            mLocationManager = (LocationManager) getApplication().getSystemService(Context.LOCATION_SERVICE);
-            isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            mLocationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
+
             mapFragment = SupportMapFragment.newInstance(options);
 
-            if (isGPSEnabled) {
-                if (ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(application.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-                            0, this);
-                    return;
-                }
-            }
             mapFragment.getMapAsync(googleMap -> {
                 LatLng latLng = new LatLng(50.088780, 14.419094);
                 lastPossition = latLng;
                 if (location != null) {
                     latLng = new LatLng(location.getLat(), location.getLng());
                     lastPossition = latLng;
-                }else if(isGPSEnabled)
-                    updateLocalPosition(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-
+                }
                 mMap = googleMap;
                 googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplication().getApplicationContext(), R.raw.map_style_dark));
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPossition, 18));
@@ -123,18 +121,17 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
             });
 
         }
-
     }
 
     final ClusterManager.OnClusterItemClickListener onClusterClickListener = new ClusterManager.OnClusterItemClickListener() {
         @Override
         public boolean onClusterItemClick(ClusterItem item) {
             if (item != null) {
-                if (item instanceof EventMarker) {
+                if (item instanceof EventMarker && ((EventMarker) item).isVisible()) {
                     previewEvent((EventMarker) item);
-                } else if (item instanceof EntityMarker) {
+                } else if (item instanceof EntityMarker && ((EntityMarker) item).isVisible()) {
                     previewEntity((EntityMarker) item);
-                } else {
+                } else if (item instanceof PlaceMarker && ((PlaceMarker) item).isVisible()) {
                     previewPlace((PlaceMarker) item);
                 }
             }
@@ -194,7 +191,7 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
         private void previewEntity(EntityMarker selected) {
             if (selected.getmEntity().size() > 1) {
                 List<ListViewItem> listViewItems = new ArrayList<>();
-                for (EntitiesGeoLocationGroupQuery.Entity entity : selected.getmEntity()) {
+                for (EntitiesGeoLocationGroupWithTransportsQuery.Entity entity : selected.getmEntity()) {
                     listViewItems.add(new ListViewItem(entity.id(), entity.label(), "entity"));
 
                 }
@@ -252,18 +249,20 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
 
         if (filters[0]) {
             //Entities groups
-            NetworkConnection.getInstance().getApolloClient().query(new EntitiesGeoLocationGroupQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<EntitiesGeoLocationGroupQuery.Data>() {
+            NetworkConnection.getInstance().getApolloClient().query(new EntitiesGeoLocationGroupWithTransportsQuery(location.longitude, location.latitude, (int) radius)).enqueue(new ApolloCall.Callback<EntitiesGeoLocationGroupWithTransportsQuery.Data>() {
                 @Override
-                public void onResponse(@NotNull Response<EntitiesGeoLocationGroupQuery.Data> response) {
-                    final List<EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup> entities = response.data().entitiesGeoLocationGroup();
-                    for (EntitiesGeoLocationGroupQuery.EntitiesGeoLocationGroup entity : entities) {
-                        //LatLng latLng = new LatLng(entity.location().lat(), entity.location().lon());
-                        EntityMarker item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map);
+                public void onResponse(@NotNull Response<EntitiesGeoLocationGroupWithTransportsQuery.Data> response) {
+                    final List<EntitiesGeoLocationGroupWithTransport> entities = response.data().entitiesGeoLocationGroupWithTransports();
+                    for (EntitiesGeoLocationGroupWithTransport entity : entities) {
+                        boolean visible = entity.entities().stream().anyMatch(entity1 -> isValidDate(entity1.date()));
+
+                        EntityMarker item = new EntityMarker(entity.location().lat(), entity.location().lon(), entity.entities(), null, R.drawable.ic_entity_map, visible);
                         markerItems.add(item);
                     }
                     doneLoading[0] = true;
                     finishLoadingMap(googleMap, doneLoading);
                 }
+
 
                 @Override
                 public void onFailure(@NotNull ApolloException e) {
@@ -279,7 +278,7 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
                 public void onResponse(@NotNull Response<EventsGeoLocationGroupQuery.Data> response) {
                     final List<EventsGeoLocationGroupQuery.EventsGeoLocationGroup> events = response.data().eventsGeoLocationGroup();
                     for (EventsGeoLocationGroupQuery.EventsGeoLocationGroup event : events) {
-                        EventMarker item = new EventMarker(event.location().lat(), event.location().lon(), event.events(), null, R.drawable.ic_event_map);
+                        EventMarker item = new EventMarker(event.location().lat(), event.location().lon(), event.events(), null, R.drawable.ic_event_map, true);
                         markerItems.add(item);
                     }
                     doneLoading[1] = true;
@@ -301,7 +300,7 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
                 public void onResponse(@NotNull final Response<PlacesGeoLocationGroupQuery.Data> response) {
                     final List<PlacesGeoLocationGroupQuery.PlacesGeoLocationGroup> places = response.data().placesGeoLocationGroup();
                     for (PlacesGeoLocationGroupQuery.PlacesGeoLocationGroup place : places) {
-                        PlaceMarker item = new PlaceMarker(place.location().lat(), place.location().lon(), place.places(), null, R.drawable.ic_place_map);
+                        PlaceMarker item = new PlaceMarker(place.location().lat(), place.location().lon(), place.places(), null, R.drawable.ic_place_map, true);
                         markerItems.add(item);
                     }
                     doneLoading[2] = true;
@@ -316,14 +315,28 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
         }
     }
 
+    private boolean isValidDate(String date) {
+        if (year == 0 && month == 0) return true;
+        final String[] dates = date.split("\\.");
+        if (Integer.valueOf(dates[2]) < year) return true;
+        if (Integer.valueOf(dates[2]) <= year && Integer.valueOf(dates[1]) <= month) return true;
+        else return false;
+
+    }
+
     private void updateMap(GoogleMap googleMap, List<CustomMarker> markerItems) {
         if (mFragment != null && mFragment.getActivity() != null) {
             mFragment.getActivity().runOnUiThread(() -> {
-                googleMap.clear();
-                mClusterManager.clearItems();
-                mClusterManager.addItems(markerItems);
-                mClusterManager.cluster();
-                loading = false;
+                try {
+                    googleMap.clear();
+                    mClusterManager.clearItems();
+                    mClusterManager.addItems(markerItems);
+                    mClusterManager.cluster();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    loading = false;
+                }
             });
         }
     }
@@ -341,24 +354,11 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
         }
     }
 
-    public void setUpMapUpdateListener() {
-        if (isGPSEnabled)
-            if (ActivityCompat.checkSelfPermission(getApplication().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplication().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            }
-    }
-
     // TODO: posun na mapě
     @Override
     public void onCameraIdle() {
         updatePosition();
     }
-
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        updateLocalPosition(location);
-    }
-
 
     public void updatePosition() {
         Log.d("IS", "CAMERA IDLE");
@@ -366,6 +366,7 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
         LatLng current = mMap.getCameraPosition().target;
         float radius = mClusterManager.getRadius(mMap);
         if (!lastPossition.equals(current)) {
+            loading = false;
             Log.d("IS", "POSITION CHANGED " + lastPossition + " new " + current);
             updateMarkers(mMap, current, radius);
             lastPossition = current;
@@ -380,14 +381,14 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
         lastPossition = current;
     }
 
-
-    private void updateLocalPosition(Location location) {
+    public void updateLocalPosition(Location location) {
         if (mMap != null) {
             Log.d("IS", "User location");
             float zoom = mMap.getCameraPosition().zoom;
             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
             float radius = mClusterManager.getRadius(mMap);
             if (!lastPossition.equals(current)) {
+                loading = false;
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastPossition, 18));
                 Log.d("IS", "POSITION CHANGED " + lastPossition + " new " + current);
                 updateMarkers(mMap, current, radius);
@@ -396,7 +397,55 @@ public class HomeViewModel extends AndroidViewModel implements CustomClusterMana
         }
     }
 
-    public GoogleMap getmMap() {
-        return mMap;
+    public void updateDatePosition() {
+        if (year != 0 && month != 0) {
+            Log.d("IS", "CAMERA IDLE");
+            float zoom = mMap.getCameraPosition().zoom;
+            LatLng current = mMap.getCameraPosition().target;
+            float radius = mClusterManager.getRadius(mMap);
+            Log.d("IS", "POSITION CHANGED " + lastPossition + " new " + current);
+            updateMarkers(mMap, current, radius);
+            lastPossition = current;
+        }
+    }
+
+    public void updateCurrentPosition(boolean gpsEnabled) {
+        boolean isGPSProviderEabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        Criteria crta = new Criteria();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD) {
+            crta.setAccuracy(Criteria.ACCURACY_FINE);
+        } else {
+            crta.setAccuracy(Criteria.ACCURACY_MEDIUM);
+        }
+        crta.setPowerRequirement(Criteria.POWER_LOW);
+        String provider = mLocationManager.getBestProvider(crta, true);
+        if ((isGPSProviderEabled || isNetworkEnabled) && gpsEnabled) {
+            if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mLocationManager.requestLocationUpdates(provider, (10 * 60 * 1000), 10, this);
+        } else if (!gpsEnabled) stopUpdating();
+    }
+
+    private void stopUpdating() {
+        mLocationManager.removeUpdates(this);
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull android.location.Location location) {
+        updateLocalPosition(location);
+    }
+
+
+    public void setYear(int year) {
+        this.year = year;
+        updateDatePosition();
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+        updateDatePosition();
     }
 }

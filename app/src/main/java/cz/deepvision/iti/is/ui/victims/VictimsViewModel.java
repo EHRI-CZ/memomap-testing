@@ -23,7 +23,7 @@ public class VictimsViewModel extends ViewModel {
     private MutableLiveData<String> mText;
     private MutableLiveData<List<RecordListItem>> mItems;
     private int mOffset;
-    private static int number = 1;
+    private int number = 1;
 
     public VictimsViewModel() {
         mText = new MutableLiveData<>();
@@ -45,10 +45,8 @@ public class VictimsViewModel extends ViewModel {
     public void loadData(){
         LatLng location = new LatLng(50.088780, 14.419094);
         int radius = 150;
-        if(mOffset>0) radius = 150 * (mOffset/24);
-        if(mOffset ==0) {
-            number = 1;
-        }
+        if(mOffset>0) radius += radius;
+
         // TODO : Zobrazení vícero osob, data takhle přijdou, takže chyba buď GRAPHQL, nebo ITI
         // TODO : Limit nefunguje s větším radiusem přijde záznamů více
         NetworkConnection.getInstance().getApolloClient().query(new EntitiesGeoListLimitedQuery(location.longitude,location.latitude,(int)radius,mOffset,24))
@@ -58,15 +56,15 @@ public class VictimsViewModel extends ViewModel {
                         List<RecordListItem> items = new ArrayList<>();
                         for (EntitiesGeoListLimitedQuery.EntitiesGeoListLimited dbItem:response.data().entitiesGeoListLimited()) {
                             RecordListItem item = new RecordListItem();
-                            item.setLabel(dbItem.entity_label());
-//                            item.setLabel(number + ":" +dbItem.entity_label());
+//                            item.setLabel(dbItem.entity_label());
+                            item.setLabel(number + ":" +dbItem.entity_label());
                             item.setKey(dbItem.id());
                             item.setUrl(dbItem.preview());
                             items.add(item);
                             number++;
                         }
                         mItems.postValue(items);
-                        mOffset+=24;
+                        mOffset+=response.data().entitiesGeoListLimited().size();
                     }
 
                     @Override

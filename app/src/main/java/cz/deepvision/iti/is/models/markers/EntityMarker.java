@@ -4,7 +4,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-import static cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupQuery.Entity;
+import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupWithTransportsQuery;
+import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupWithTransportsQuery.Entity;
+
 
 public class EntityMarker  extends CustomMarker<Entity>
 {
@@ -22,16 +24,22 @@ public class EntityMarker  extends CustomMarker<Entity>
 //    }
 
 
-    public EntityMarker(double lat, double lng, List<Entity> entityList, String snippet, int iconRes) {
-        super(lat,lng,entityList,snippet,iconRes);
+    public EntityMarker(double lat, double lng, List<Entity> entityList, String snippet, int iconRes, boolean visible) {
+        super(lat,lng,entityList,snippet,iconRes,visible);
         mPosition = new LatLng(lat, lng);
         mEntity = entityList;
         mSnippet = snippet;
         icon = iconRes;
     }
 
+    @Override
     public List<Entity> getmEntity() {
         return mEntity;
+    }
+
+    @Override
+    public void setmEntity(List<Entity> mEntity) {
+        this.mEntity = mEntity;
     }
 
     @Override
@@ -58,9 +66,6 @@ public class EntityMarker  extends CustomMarker<Entity>
      * Set the title of the marker
      * @param mEntity Single person entity
      */
-    public void setmEntity(List<Entity> mEntity) {
-        this.mEntity = mEntity;
-    }
 
     /**
      * Set the description of the marker

@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -55,11 +56,15 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
     private final int MIN_DISTANCE = 150;
     private int style = 0;
     Fragment fragment;
+//    final static float move = 200;
+//    float ratio = 1.0f;
+//    private int baseDist;
+//    private float baseRatio;
 
 
     /**
      * @param inputFragment Fragment for checking current position
-     * @param smallDialog Fullscreen ?
+     * @param smallDialog   Fullscreen ?
      * @param style         0 - default, -1 left slide, 1 right slide, 2 slideUp
      */
 
@@ -84,14 +89,10 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         super.onCreate(savedInstanceState);
         setAllowEnterTransitionOverlap(true);
         setAllowReturnTransitionOverlap(true);
-        if (style == 0)
-            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog);
-        else if (style == -1)
-            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog_SlideLeft);
-        else if (style == 1)
-            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideRight);
-        else
-            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideUpDown);
+        if (style == 0) setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog);
+        else if (style == -1) setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog_SlideLeft);
+        else if (style == 1) setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideRight);
+        else setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideUpDown);
     }
 
     public void setOnShowAnotherElement(OnShowAnotherElement onShowAnotherElement) {
@@ -153,37 +154,67 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         setCancelable(false);
         firstIcon.setOnClickListener(view1 -> updateDataOnMap(null));
 
-        View.OnTouchListener onTouchListener = new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.performClick();
-                switch (event.getAction()) {
+        View.OnTouchListener onTouchListener = (v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    oldTouchValue = event.getX();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    currentX = event.getX();
+                    if (oldTouchValue < currentX) {
+                        if (currentX - oldTouchValue > MIN_DISTANCE) if (onShowAnotherElement != null) {
+                            onShowAnotherElement.showPrevious();
+                        }
+                    } else {
+                        if (oldTouchValue - currentX > MIN_DISTANCE) if (onShowAnotherElement != null) {
+                            onShowAnotherElement.showNext();
+                        }
+                    }
+                    break;
+            }
+            return false;
+        };
+        /*
+        View.OnTouchListener photoListener = (v, event) -> {
+            switch (event.getAction()) {
+                if (event.getPointerCount() == 2) {
+                    int action = event.getAction();
+                    int mainaction = action & MotionEvent.ACTION_MASK;
+                    if (mainaction == MotionEvent.ACTION_POINTER_DOWN) {
+                        baseDist = getDistance(event);
+                        baseRatio = ratio;
+                    } else {
+                        float scale = (getDistance(event) - baseDist) / move;
+                        float factor= (float) Math.pow(2,scale);
+                        ratio = Math.min(1024.0f,Math.max(0.1f,baseRatio*factor));
+                    }
+                } else {
                     case MotionEvent.ACTION_DOWN:
                         oldTouchValue = event.getX();
                         break;
                     case MotionEvent.ACTION_UP:
                         currentX = event.getX();
                         if (oldTouchValue < currentX) {
-                            if (currentX - oldTouchValue > MIN_DISTANCE)
-                                if (onShowAnotherElement != null) {
-                                    onShowAnotherElement.showPrevious();
-                                }
+                            if (currentX - oldTouchValue > MIN_DISTANCE) if (onShowAnotherElement != null) {
+                                onShowAnotherElement.showPrevious();
+                            }
                         } else {
-                            if (oldTouchValue - currentX > MIN_DISTANCE)
-                                if (onShowAnotherElement != null) {
-                                    onShowAnotherElement.showNext();
-                                }
+                            if (oldTouchValue - currentX > MIN_DISTANCE) if (onShowAnotherElement != null) {
+                                onShowAnotherElement.showNext();
+                            }
                         }
                         break;
                 }
-                return false;
-            }
+            } return false;
+
         };
+    */
         if (getParentFragment() != null) {
             if (!smallDialog && !(getParentFragment() instanceof HomeFragment)) {
                 root.setOnTouchListener(onTouchListener);
                 infoContainer.setOnTouchListener(onTouchListener);
                 documentContainer.setOnTouchListener(onTouchListener);
+//                photo.setOnTouchListener(photoListener);
             }
         }
 
@@ -192,21 +223,27 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 name.setLineHeight(60);
             }
+            ((MotionLayout) root).setInteractionEnabled(false);
+
         } else {
             name.setTextSize(30);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 name.setLineHeight(100);
             }
-        }
-        if (!smallDialog) {
             if (!fragment.getClass().getName().equals("cz.deepvision.iti.is.ui.home.HomeFragment")) {
                 firstIcon.setVisibility(View.VISIBLE);
                 firstIcon.setImageDrawable(ctx.getDrawable(R.drawable.ic_iti_menu_map));
             } else {
                 firstIcon.setVisibility(View.GONE);
             }
-            documentContainer.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         }
+        documentContainer.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+    }
+
+    private int getDistance(MotionEvent event) {
+        int dx = (int) (event.getX(0) - event.getX(1));
+        int dy = (int) (event.getY(0) - event.getY(1));
+        return (int) (Math.sqrt(dx * dx + dy * dy));
     }
 
     public boolean isSmallDialog() {

@@ -24,7 +24,7 @@ public class PlacesViewModel extends ViewModel {
 
     private MutableLiveData<List<RecordListItem>> mItems;
     private int mOffset;
-    private static int number = 1;
+    private int number = 1;
 
     public PlacesViewModel() {
         mText = new MutableLiveData<>();
@@ -46,10 +46,8 @@ public class PlacesViewModel extends ViewModel {
     public void loadData(){
         LatLng location = new LatLng(50.089397, 14.416994);
         int radius = 150;
-        if(mOffset>0) radius = 150 * (mOffset/12);
-        if(mOffset ==0) {
-            number = 1;
-        }
+        if(mOffset>0) radius += radius;
+
         NetworkConnection.getInstance().getApolloClient().query(new PlacesGeoListLimitedQuery(location.longitude,location.latitude,(int)radius,mOffset,12))
                 .enqueue(new ApolloCall.Callback<PlacesGeoListLimitedQuery.Data>() {
                     @Override
@@ -64,7 +62,7 @@ public class PlacesViewModel extends ViewModel {
                             number++;
                         }
                         mItems.postValue(items);
-                        mOffset+=12;
+                        mOffset+=response.data().placesGeoListLimited().size();
                     }
 
                     @Override

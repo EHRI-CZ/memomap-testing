@@ -9,10 +9,13 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+
 import cz.deepvision.iti.is.models.victims.Document;
 import cz.deepvision.iti.is.util.Requester;
 
@@ -22,7 +25,7 @@ public class DocumentDialog extends DefaultDialog implements DefaultDialog.Updat
     private Document data;
 
 
-    public DocumentDialog(@NonNull Fragment inputFragment,Document data) {
+    public DocumentDialog(@NonNull Fragment inputFragment, Document data) {
         super(inputFragment, false);
         this.data = data;
         fragment = inputFragment;
@@ -50,7 +53,12 @@ public class DocumentDialog extends DefaultDialog implements DefaultDialog.Updat
             firstIcon.setVisibility(View.GONE);
             secondIcon.setVisibility(View.GONE);
             name.setText(data.getName());
-            addInfo(infoContainer, "Oběti šoa, jejichž se dokument týká:" + data.getName());
+            if (data.getName() == null) {
+                ((MotionLayout) root).setInteractionEnabled(false);
+                ((MotionLayout) root).transitionToEnd();
+            }
+            if (data.getName() != null) addInfo(infoContainer, "Oběti šoa, jejichž se dokument týká:" + data.getName());
+
             Requester requester = new Requester(fragment.getActivity());
             requester.makeRequestForAdapter(data.getFullImage(), photo);
         }

@@ -21,8 +21,8 @@ public class EventMarker extends CustomMarker<EventsGeoLocationGroupQuery.Event>
 //    }
 
 
-    public EventMarker(double lat, double lng, List<EventsGeoLocationGroupQuery.Event> entityList, String snippet, int iconRes) {
-        super(lat,lng,entityList,snippet,iconRes);
+    public EventMarker(double lat, double lng, List<EventsGeoLocationGroupQuery.Event> entityList, String snippet, int iconRes, boolean visible) {
+        super(lat,lng,entityList,snippet,iconRes,visible);
         mPosition = new LatLng(lat, lng);
         mEvents = entityList;
         mSnippet = snippet;

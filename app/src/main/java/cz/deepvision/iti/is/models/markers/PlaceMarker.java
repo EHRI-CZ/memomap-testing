@@ -13,8 +13,8 @@ public class PlaceMarker extends CustomMarker<Place> {
     public final int icon;
 
 
-    public PlaceMarker(double lat, double lng, List<Place> entityList, String snippet, int iconRes) {
-        super(lat, lng, iconRes);
+    public PlaceMarker(double lat, double lng, List<Place> entityList, String snippet, int iconRes, boolean visible) {
+        super(lat, lng, iconRes,visible);
         mPosition = new LatLng(lat, lng);
         mEntity = entityList;
         mSnippet = snippet;

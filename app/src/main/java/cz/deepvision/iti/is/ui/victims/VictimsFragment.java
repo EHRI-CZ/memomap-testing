@@ -52,25 +52,10 @@ public class VictimsFragment extends Fragment {
         loadMoreRecords = root.findViewById(R.id.load_more_places);
         loadMoreRecords.setVisibility(View.GONE);
         loadMoreRecords.setOnClickListener(view -> {
-            if (itemList.size() <= 20) {
-                itemList.add(null);
-                adapter.notifyItemInserted(itemList.size() - 1);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-//                        itemList.remove(itemList.size() - 1);
-//                        adapter.notifyItemRemoved(itemList.size());
-                        //LOAD DATA
-                        victimsViewModel.loadData();
-                        adapter.notifyDataSetChanged();
-                    }
-                }, 5000);
-            } else {
-                victimsViewModel.loadData();
-                startAnimation(container, View.GONE);
-                adapter.notifyDataSetChanged();
-
-            }
+            victimsViewModel.loadData();
+            startAnimation(container, View.GONE);
+            adapter.notifyDataSetChanged();
+            Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
         });
 
         victimsViewModel.getItems().observe(getViewLifecycleOwner(), new Observer<List<RecordListItem>>() {
@@ -79,8 +64,6 @@ public class VictimsFragment extends Fragment {
                 Log.d("IS", "Items changed");
                 itemList.addAll(victimListItems);
                 adapter.notifyDataSetChanged();
-                if (itemList.size() > 24)
-                    Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
@@ -91,8 +74,7 @@ public class VictimsFragment extends Fragment {
         adapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void hideButton() {
-                if (loadMoreRecords.getVisibility() == View.VISIBLE)
-                    startAnimation(container, View.GONE);
+                if (loadMoreRecords.getVisibility() == View.VISIBLE) startAnimation(container, View.GONE);
             }
 
             @Override
@@ -109,11 +91,6 @@ public class VictimsFragment extends Fragment {
         super.onStart();
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
-//        DividerItemDecoration horizontalDecoration = new DividerItemDecoration(getContext(),
-//                DividerItemDecoration.VERTICAL);
-//        Drawable horizontalDivider = ContextCompat.getDrawable(getActivity(), R.drawable.space_divider);
-//        horizontalDecoration.setDrawable(horizontalDivider);
-//        recyclerView.addItemDecoration(horizontalDecoration);
     }
 
 

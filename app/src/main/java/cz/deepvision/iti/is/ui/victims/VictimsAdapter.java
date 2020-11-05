@@ -70,10 +70,6 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.showButton();
                     }
-                } else if (totalItemCount < 23) {
-                    if (onLoadMoreListener != null) {
-                        onLoadMoreListener.showButton();
-                    }
                 } else if (lastVisibleItem < totalItemCount - 5)
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.hideButton();
@@ -137,33 +133,33 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             card = view.findViewById(R.id.row_root_element);
             icon = view.findViewById(R.id.imageView);
             card.setOnClickListener(view1 -> {
+
+                NetworkConnection.getInstance().getApolloClient().query(new EntityDetailQuery(key)).enqueue(new ApolloCall.Callback<EntityDetailQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull Response<EntityDetailQuery.Data> response) {
+                        if (response.data() != null && response.data().entityDetail() != null) {
+                            EntityDetailQuery.EntityDetail responseData = response.data().entityDetail();
+                            data = new Person(responseData);
+
+                            victimDialog = new VictimDialog(fragment, data, false, 0);
+                            fragment.getActivity().runOnUiThread(() -> victimDialog.updateData(data));
+
+                            victimDialog.setOnShowAnotherElement(onShowAnotherElement);
+                            victimDialog.show(fragment.getChildFragmentManager(), VictimDialog.class.getName());
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        Log.e("IS", e.getMessage());
+                    }
+                });
                 card.animate().setDuration(200).alpha(0.8f).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-
-                        NetworkConnection.getInstance().getApolloClient().query(new EntityDetailQuery(key)).enqueue(new ApolloCall.Callback<EntityDetailQuery.Data>() {
-                            @Override
-                            public void onResponse(@NotNull Response<EntityDetailQuery.Data> response) {
-                                if (response.data() != null && response.data().entityDetail() != null) {
-                                    EntityDetailQuery.EntityDetail responseData = response.data().entityDetail();
-                                    data = new Person(responseData);
-
-                                    victimDialog = new VictimDialog(fragment, data, false, 0);
-                                    fragment.getActivity().runOnUiThread(() -> victimDialog.updateData(data));
-
-                                    victimDialog.setOnShowAnotherElement(onShowAnotherElement);
-                                    victimDialog.show(fragment.getChildFragmentManager(), VictimDialog.class.getName());
-                                    card.setAlpha(1f);
-
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(@NotNull ApolloException e) {
-                                Log.e("IS", e.getMessage());
-                            }
-                        });
+                        card.setAlpha(1f);
                     }
                 });
             });

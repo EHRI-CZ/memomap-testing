@@ -54,24 +54,10 @@ public class PlacesFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (itemList.size() <= 20) {
-                    itemList.add(null);
-                    adapter.notifyItemInserted(itemList.size() - 1);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-//                            itemList.remove(itemList.size() - 1);
-//                            adapter.notifyItemRemoved(itemList.size());
-                            //LOAD DATA
-                            placesViewModel.loadData();
-                            adapter.notifyDataSetChanged();
-                        }
-                    }, 5000);
-                } else {
                     placesViewModel.loadData();
                     adapter.notifyDataSetChanged();
                     button.setVisibility(View.GONE);
-                }
+                    Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -81,8 +67,6 @@ public class PlacesFragment extends Fragment {
                 Log.d("IS", "Items changed");
                 itemList.addAll(victimListItems);
                 adapter.notifyDataSetChanged();
-                if (itemList.size() > 23)
-                    Toast.makeText(getContext(), "Data byla načtena", Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
@@ -118,11 +102,11 @@ public class PlacesFragment extends Fragment {
         super.onStart();
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
-        DividerItemDecoration horizontalDecoration = new DividerItemDecoration(getContext(),
-                DividerItemDecoration.VERTICAL);
-        Drawable horizontalDivider = ContextCompat.getDrawable(getActivity(), R.drawable.divider);
-        horizontalDecoration.setDrawable(horizontalDivider);
-        recyclerView.addItemDecoration(horizontalDecoration);
+//        DividerItemDecoration horizontalDecoration = new DividerItemDecoration(getContext(),
+//                DividerItemDecoration.VERTICAL);
+//        Drawable horizontalDivider = ContextCompat.getDrawable(getActivity(), R.drawable.divider);
+//        horizontalDecoration.setDrawable(horizontalDivider);
+//        recyclerView.addItemDecoration(horizontalDecoration);
     }
 
     @Override

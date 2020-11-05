@@ -72,10 +72,6 @@ public class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.showButton();
                     }
-                } else if (totalItemCount < 12) {
-                    if (onLoadMoreListener != null) {
-                        onLoadMoreListener.showButton();
-                    }
                 } else if (lastVisibleItem < totalItemCount - 5)
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.hideButton();

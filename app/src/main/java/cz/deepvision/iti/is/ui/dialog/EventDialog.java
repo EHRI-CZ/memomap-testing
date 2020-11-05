@@ -153,6 +153,7 @@ public class EventDialog extends DefaultDialog implements DefaultDialog.Updater<
 
     }
 
+
     @Override
     public void updateData(Event data) {
         this.data = data;

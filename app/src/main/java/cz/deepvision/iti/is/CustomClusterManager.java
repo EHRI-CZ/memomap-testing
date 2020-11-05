@@ -4,9 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -105,8 +109,7 @@ public class CustomClusterManager<M> extends ClusterManager {
         protected void onClusterItemUpdated(@NonNull CustomMarker item, @NonNull Marker marker) {
             super.onClusterItemUpdated(item, marker);
             try {
-                if (marker.getTag() != null)
-                    marker.setIcon(bitmapDescriptorFromVector(cnt, item));
+                if (marker.getTag() != null) marker.setIcon(bitmapDescriptorFromVector(cnt, item));
             } catch (Exception e) {
                 Log.e("IS", e.getMessage());
             }
@@ -127,27 +130,38 @@ public class CustomClusterManager<M> extends ClusterManager {
             Drawable iconDrawable = ContextCompat.getDrawable(context, item.getIcon());
             iconDrawable.setBounds(0, 0, (int) (iconDrawable.getIntrinsicWidth() / resize), (int) (iconDrawable.getIntrinsicHeight() / resize));
 
-            Bitmap bmp = Bitmap.createBitmap((int) (iconDrawable.getIntrinsicWidth() / resize), (int)(iconDrawable.getIntrinsicHeight() / resize), Bitmap.Config.ARGB_8888);
+            Bitmap bmp = Bitmap.createBitmap((int) (iconDrawable.getIntrinsicWidth() / resize), (int) (iconDrawable.getIntrinsicHeight() / resize), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bmp);
 
+            //TODO : dopsat filter na datum a čas
+            if (!item.isVisible()) {
+                ColorMatrix cm = new ColorMatrix();
+                cm.setSaturation(0);
+                Paint paint = new Paint();
+                ColorFilter filter = new ColorMatrixColorFilter(cm);
+                paint.setColorFilter(filter);
+
+                iconDrawable.setColorFilter(filter);
+            }
             iconDrawable.draw(canvas);
 
             if (item.getmEntity().size() > 1) {
-                Paint paint = new Paint();
+                Paint whitePaint = new Paint();
 
                 Rect clipBounds = canvas.getClipBounds();
                 int cHeight = clipBounds.height();
                 int cWidth = clipBounds.width();
 
                 String text = String.valueOf(item.getmEntity().size());
-                paint.setColor(Color.WHITE);
-                paint.setTextSize(25);
-                paint.setTextAlign(Paint.Align.LEFT);
-                paint.getTextBounds(text, 0, text.length(), clipBounds);
+                whitePaint.setColor(Color.WHITE);
+                whitePaint.setTextSize(25);
+                whitePaint.setTextAlign(Paint.Align.LEFT);
+                whitePaint.getTextBounds(text, 0, text.length(), clipBounds);
                 float x = cWidth / 2f - clipBounds.width() / 2f - clipBounds.left;
                 float y = cHeight / 1.2f;
-                canvas.drawText(text, x, y, paint);
+                canvas.drawText(text, x, y, whitePaint);
             }
+
             return BitmapDescriptorFactory.fromBitmap(bmp);
         }
     }

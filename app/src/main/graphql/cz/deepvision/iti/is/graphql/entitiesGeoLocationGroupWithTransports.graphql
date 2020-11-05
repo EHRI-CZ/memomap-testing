@@ -1,0 +1,11 @@
+query entitiesGeoLocationGroupWithTransports($lon: Float!, $lat: Float!, $radius: Int!){
+    entitiesGeoLocationGroupWithTransports(lon: $lon, lat: $lat, meters: $radius) {
+        location{lat,lon},
+        groupCount
+        entities{
+            id
+            label
+            date
+        }
+    }
+}
