@@ -74,5 +74,5 @@ public class NetworkConnection {
                 }
             }).build();
 
-    public final ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_DV/iti").build();
+    public final ApolloClient apolloClient = ApolloClient.builder().serverUrl("http://77.236.207.194:8529/_db/ITI_2021/api3").build();
 }

@@ -7,11 +7,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.*;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,14 +25,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import cz.deepvision.iti.is.OnShowAnotherElement;
@@ -50,16 +53,11 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
     protected LinearLayout infoContainer;
     protected LinearLayout iconsContainer;
     protected RecyclerView documentContainer;
-    protected boolean isImageFitToScreen = false;
     protected float oldTouchValue, currentX;
     private OnShowAnotherElement onShowAnotherElement;
     private final int MIN_DISTANCE = 150;
     private int style = 0;
     Fragment fragment;
-//    final static float move = 200;
-//    float ratio = 1.0f;
-//    private int baseDist;
-//    private float baseRatio;
 
 
     /**
@@ -89,10 +87,14 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         super.onCreate(savedInstanceState);
         setAllowEnterTransitionOverlap(true);
         setAllowReturnTransitionOverlap(true);
-        if (style == 0) setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog);
-        else if (style == -1) setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog_SlideLeft);
-        else if (style == 1) setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideRight);
-        else setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideUpDown);
+        if (style == 0)
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog);
+        else if (style == -1)
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialog_SlideLeft);
+        else if (style == 1)
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideRight);
+        else
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.ThemeOverlay_MyTheme_BottomSheetDialogSlideUpDown);
     }
 
     public void setOnShowAnotherElement(OnShowAnotherElement onShowAnotherElement) {
@@ -134,9 +136,11 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         root = (ConstraintLayout) view;
         name = view.findViewById(R.id.txt_info);
         photo = view.findViewById(R.id.img_general);
+
         infoContainer = view.findViewById(R.id.info_container);
         iconsContainer = view.findViewById(R.id.info_container);
         documentContainer = view.findViewById(R.id.document_container);
+
 
         firstIcon = view.findViewById(R.id.img_full_view);
         secondIcon = view.findViewById(R.id.img_navigate);
@@ -151,6 +155,7 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
             });
         });
 
+
         setCancelable(false);
         firstIcon.setOnClickListener(view1 -> updateDataOnMap(null));
 
@@ -162,53 +167,21 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
                 case MotionEvent.ACTION_UP:
                     currentX = event.getX();
                     if (oldTouchValue < currentX) {
-                        if (currentX - oldTouchValue > MIN_DISTANCE) if (onShowAnotherElement != null) {
-                            onShowAnotherElement.showPrevious();
-                        }
+                        if (currentX - oldTouchValue > MIN_DISTANCE)
+                            if (onShowAnotherElement != null) {
+                                onShowAnotherElement.showPrevious();
+                            }
                     } else {
-                        if (oldTouchValue - currentX > MIN_DISTANCE) if (onShowAnotherElement != null) {
-                            onShowAnotherElement.showNext();
-                        }
+                        if (oldTouchValue - currentX > MIN_DISTANCE)
+                            if (onShowAnotherElement != null) {
+                                onShowAnotherElement.showNext();
+                            }
                     }
                     break;
             }
             return false;
         };
-        /*
-        View.OnTouchListener photoListener = (v, event) -> {
-            switch (event.getAction()) {
-                if (event.getPointerCount() == 2) {
-                    int action = event.getAction();
-                    int mainaction = action & MotionEvent.ACTION_MASK;
-                    if (mainaction == MotionEvent.ACTION_POINTER_DOWN) {
-                        baseDist = getDistance(event);
-                        baseRatio = ratio;
-                    } else {
-                        float scale = (getDistance(event) - baseDist) / move;
-                        float factor= (float) Math.pow(2,scale);
-                        ratio = Math.min(1024.0f,Math.max(0.1f,baseRatio*factor));
-                    }
-                } else {
-                    case MotionEvent.ACTION_DOWN:
-                        oldTouchValue = event.getX();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        currentX = event.getX();
-                        if (oldTouchValue < currentX) {
-                            if (currentX - oldTouchValue > MIN_DISTANCE) if (onShowAnotherElement != null) {
-                                onShowAnotherElement.showPrevious();
-                            }
-                        } else {
-                            if (oldTouchValue - currentX > MIN_DISTANCE) if (onShowAnotherElement != null) {
-                                onShowAnotherElement.showNext();
-                            }
-                        }
-                        break;
-                }
-            } return false;
 
-        };
-    */
         if (getParentFragment() != null) {
             if (!smallDialog && !(getParentFragment() instanceof HomeFragment)) {
                 root.setOnTouchListener(onTouchListener);
@@ -216,6 +189,10 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
                 documentContainer.setOnTouchListener(onTouchListener);
 //                photo.setOnTouchListener(photoListener);
             }
+        } else if (this instanceof DocumentDialog) {
+            root.setOnTouchListener(onTouchListener);
+            infoContainer.setOnTouchListener(onTouchListener);
+            documentContainer.setOnTouchListener(onTouchListener);
         }
 
         if (smallDialog) {
@@ -223,7 +200,6 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 name.setLineHeight(60);
             }
-            ((MotionLayout) root).setInteractionEnabled(false);
 
         } else {
             name.setTextSize(30);
@@ -240,26 +216,12 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         documentContainer.setLayoutManager(new GridLayoutManager(getActivity(), 3));
     }
 
-    private int getDistance(MotionEvent event) {
-        int dx = (int) (event.getX(0) - event.getX(1));
-        int dy = (int) (event.getY(0) - event.getY(1));
-        return (int) (Math.sqrt(dx * dx + dy * dy));
-    }
-
     public boolean isSmallDialog() {
         return smallDialog;
     }
 
     protected interface Updater<T> {
         void updateData(T data);
-    }
-
-
-    protected void hideUI(int visibility) {
-        name.setVisibility(visibility);
-        infoContainer.setVisibility(visibility);
-        documentContainer.setVisibility(visibility);
-
     }
 
     protected void showDataOnMap(Location location) {
@@ -292,10 +254,12 @@ public abstract class DefaultDialog extends DialogFragment implements Requester.
         });
     }
 
+
     @Override
     public void update(Bitmap bmp) {
         if (bmp != null) {
             photo.setImageBitmap(bmp);
         }
     }
+
 }

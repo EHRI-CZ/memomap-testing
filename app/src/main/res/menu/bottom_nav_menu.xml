@@ -3,27 +3,28 @@
 
     <item
         android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_iti_menu_map"
+        android:icon="@drawable/ic_menu_mapa"
+        android:iconTint="@color/gray"
         android:title="@string/title_home" />
 
     <item
         android:id="@+id/navigation_victims"
-        android:icon="@drawable/ic_iti_menu_person"
+        android:icon="@drawable/ic_menu_obet"
         android:title="@string/title_victims" />
 
     <item
         android:id="@+id/navigation_places"
-        android:icon="@drawable/ic_iti_menu_place"
+        android:icon="@drawable/ic_menu_misto"
         android:title="@string/title_places" />
 
     <item
         android:id="@+id/navigation_events"
-        android:icon="@drawable/ic_iti_menu_event"
+        android:icon="@drawable/ic_menu_incident"
         android:title="@string/title_events" />
 
     <item
         android:id="@+id/navigation_about"
-        android:icon="@drawable/ic_iti_menu_info"
+        android:icon="@drawable/ic_menu_info"
         android:title="@string/title_about" />
 
 </menu>

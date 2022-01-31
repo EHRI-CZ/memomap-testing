@@ -1,9 +1,10 @@
 package cz.deepvision.iti.is.models.markers;
 
 import com.google.android.gms.maps.model.LatLng;
-import cz.deepvision.iti.is.graphql.EventsGeoLocationGroupQuery;
 
 import java.util.List;
+
+import cz.deepvision.iti.is.graphql.EventsGeoLocationGroupQuery;
 
 public class EventMarker extends CustomMarker<EventsGeoLocationGroupQuery.Event>
 {
@@ -43,9 +44,12 @@ public class EventMarker extends CustomMarker<EventsGeoLocationGroupQuery.Event>
 
     private String getWholeTitle(List<EventsGeoLocationGroupQuery.Event> getmEvents) {
         String title = "";
-        for (EventsGeoLocationGroupQuery.Event event : getmEvents) {
-            title += " ";
-            title += event.label();
+        if(getmEvents != null)
+        {
+            for (EventsGeoLocationGroupQuery.Event event : getmEvents) {
+                title += " ";
+                title += event.label();
+            }
         }
         return title;
     }

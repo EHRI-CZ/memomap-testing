@@ -1,7 +1,6 @@
 package cz.deepvision.iti.is.ui.events;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.OnShowAnotherElement;
@@ -28,13 +30,8 @@ import cz.deepvision.iti.is.graphql.EventDetailQuery;
 import cz.deepvision.iti.is.models.Event;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
 import cz.deepvision.iti.is.ui.dialog.EventDialog;
-import cz.deepvision.iti.is.ui.places.PlacesAdapter;
 import cz.deepvision.iti.is.util.NetworkConnection;
 import cz.deepvision.iti.is.util.Requester;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
@@ -171,11 +168,11 @@ public class EventsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.url = url;
             this.title.setText(label);
             this.position = position;
-            if (url != null) {
+            if (url != null || url.length() > 10) {
                 String substring = url.substring(1);
                 Requester requester = new Requester(fragment.getActivity());
                 requester.makeRequestForAdapter(substring, icon);
-            } else icon.setImageDrawable(activity.getDrawable(R.drawable.no_portrait_icon));
+            } else icon.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_event));
         }
 
         public void showAnotherElement(String key) {

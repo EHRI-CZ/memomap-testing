@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">ITI - Integrace&amp;Segregace</string>
-    <string name="title_home">Map</string>
-    <string name="title_victims">Victims</string>
-    <string name="title_places">Places</string>
-    <string name="title_events">Events</string>
-    <string name="title_about">About</string>
+    <string name="app_name">Memomap</string>
+    <string name="title_home">Mapa</string>
+    <string name="title_victims">Oběti</string>
+    <string name="title_places">Místa</string>
+    <string name="title_events">Události</string>
+    <string name="title_about">O aplikaci</string>
 </resources>

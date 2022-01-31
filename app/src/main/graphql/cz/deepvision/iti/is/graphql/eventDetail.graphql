@@ -5,6 +5,7 @@ query eventDetail($id : String!){
         label
         place
         date
+        description
         location{
             lat
             lon

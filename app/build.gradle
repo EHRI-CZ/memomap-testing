@@ -3,16 +3,16 @@ apply plugin: 'realm-android'
 apply plugin: 'com.apollographql.android'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.1"
+    compileSdkVersion 31
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "cz.deepvision.iti.is"
+        applicationId "cz.deepvision.iti.is.test"
         minSdkVersion 25
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
-
+        ndkVersion "22.1.7171670"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -34,7 +34,7 @@ android {
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             ndk {
-                abiFilters "armeabi-v7a", "x86"//, "arm64-v8a","x86",
+                abiFilters "armeabi-v7a","armeabi", "arm64-v8a","x86"
             }
         }
         debug {
@@ -43,7 +43,7 @@ android {
             zipAlignEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             ndk {
-                abiFilters "armeabi-v7a", "x86"//, "arm64-v8a","x86",
+                abiFilters "armeabi-v7a","armeabi", "arm64-v8a","x86"
             }
         }
     }
@@ -67,6 +67,7 @@ dependencies {
     implementation 'com.github.warkiz.widget:indicatorseekbar:2.1.2'
     implementation 'io.realm:android-adapters:3.1.0'
     implementation 'com.google.maps.android:android-maps-utils:2.0.3'
+
 
     //Apollo - graphql
     implementation "com.apollographql.apollo:apollo-runtime:$apollo_version"

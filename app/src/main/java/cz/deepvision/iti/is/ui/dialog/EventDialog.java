@@ -1,8 +1,9 @@
 package cz.deepvision.iti.is.ui.dialog;
 
+import static cz.deepvision.iti.is.util.LayoutGenerator.addInfo;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,11 +25,7 @@ import cz.deepvision.iti.is.graphql.EntityDetailQuery;
 import cz.deepvision.iti.is.models.Event;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
-import cz.deepvision.iti.is.util.LayoutGenerator;
 import cz.deepvision.iti.is.util.NetworkConnection;
-import cz.deepvision.iti.is.util.Requester;
-
-import static cz.deepvision.iti.is.util.LayoutGenerator.*;
 
 public class EventDialog extends DefaultDialog implements DefaultDialog.Updater<Event> {
     private Event data;

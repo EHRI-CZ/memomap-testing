@@ -10,33 +10,9 @@
         <item>"1945"</item>
     </array>
     <array name="months_v2">
-        <item>"1"</item>
-        <item>"2"</item>
-        <item>"3"</item>
-        <item>"4"</item>
-        <item>"5"</item>
-        <item>"6"</item>
-        <item>"7"</item>
-        <item>"8"</item>
-        <item>"9"</item>
-        <item>"10"</item>
-        <item>"11"</item>
-        <item>"12"</item>
-
-    </array>
-    <array name="months">
-        <item>"Leden"</item>
-        <item>"Únor"</item>
-        <item>"Březen"</item>
-        <item>"Duben"</item>
-        <item>"Květen"</item>
-        <item>"Červen"</item>
-        <item>"Červenec"</item>
-        <item>"Srpen"</item>
-        <item>"Zaří"</item>
-        <item>"Říjen"</item>
-        <item>"Listopad"</item>
-        <item>"Prosinec"</item>
-
+        <item>"1 kvartál"</item>
+        <item>"2 kvartál"</item>
+        <item>"3 kvartál"</item>
+        <item>"4 kvartál"</item>
     </array>
 </resources>

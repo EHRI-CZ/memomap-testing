@@ -4,22 +4,16 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Application;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,23 +23,21 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.warkiz.widget.IndicatorSeekBar;
 import com.warkiz.widget.OnSeekChangeListener;
 import com.warkiz.widget.SeekParams;
 
-import java.time.LocalDate;
-import java.util.Arrays;
-
+import cz.deepvision.iti.is.BaseApp;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Location;
 
 public class HomeFragment extends Fragment {
     private final String[] mPermission = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private HomeViewModel homeViewModel;
-    private boolean progressBarMoved = false;
-    private int timeElapsed = 0;
-    private boolean gpsEnabled = false;
+    private boolean filtersEnabled = false;
+
+    //private boolean progressBarMoved = false;
+    //private int timeElapsed = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Location location = null;
@@ -55,38 +47,89 @@ public class HomeFragment extends Fragment {
 
         homeViewModel = ViewModelProviders.of(this, new HomeViewModelFactory((Application) getContext().getApplicationContext(), location)).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
-
         homeViewModel.setmFragment(this);
-         
+
 
         ImageView gpsLocationProvider = root.findViewById(R.id.gps_provider);
         gpsLocationProvider.bringToFront();
-        gpsLocationProvider.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (gpsEnabled) {
-                    gpsEnabled = false;
-                    gpsLocationProvider.setImageResource(R.drawable.ic_gps_off);
-                    Toast.makeText(getContext(), "Lokalizační služby byly vypnuty", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(mPermission, 1);
-                    } else {
-                        gpsEnabled = true;
-                        gpsLocationProvider.setImageResource(R.drawable.ic_gps_on);
-                        Toast.makeText(getContext(), "Lokalizační služby byly zapnuty", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                homeViewModel.updateCurrentPosition(gpsEnabled);
+
+        gpsLocationProvider.setOnClickListener(view -> {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(mPermission, 1);
+                return;
+            }
+            if (BaseApp.isGpsEnabled()) {
+                BaseApp.setGpsEnabled(false);
+                gpsLocationProvider.setImageResource(R.drawable.ic_poloha_pasivni);
+                Toast.makeText(getContext(), "Lokalizační služby byly vypnuty", Toast.LENGTH_SHORT).show();
+            } else {
+                BaseApp.setGpsEnabled(true);
+                gpsLocationProvider.setImageResource(R.drawable.ic_poloha_aktivni);
+                Toast.makeText(getContext(), "Lokalizační služby byly zapnuty", Toast.LENGTH_SHORT).show();
+            }
+            homeViewModel.updateCurrentPosition(BaseApp.isGpsEnabled());
+
+        });
+
+        LinearLayout chechBoxesLayout = root.findViewById(R.id.check_group);
+
+        ImageView filtersIcon = root.findViewById(R.id.filters);
+        filtersIcon.bringToFront();
+
+        filtersIcon.setOnClickListener(view -> {
+            if (!filtersEnabled) {
+               chechBoxesLayout.animate()
+                       .translationXBy(-chechBoxesLayout.getWidth())
+                       .setDuration(600)
+                       .setInterpolator(new AccelerateDecelerateInterpolator())
+                       .setListener(new AnimatorListenerAdapter() {
+                           @Override
+                           public void onAnimationEnd(Animator animation) {
+                               view.setClickable(true);
+                               filtersIcon.setImageResource(R.drawable.ic_filtr_aktivni);
+
+                               super.onAnimationEnd(animation);
+                           }
+
+                           @Override
+                           public void onAnimationStart(Animator animation) {
+                               view.setClickable(false);
+                               super.onAnimationStart(animation);
+
+                           }
+                       })
+                       .start();
+               filtersEnabled = true;
+            } else {
+                chechBoxesLayout.animate()
+                        .translationXBy(chechBoxesLayout.getWidth())
+                        .setDuration(600)
+                        .setInterpolator(new AccelerateDecelerateInterpolator())
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                view.setClickable(true);
+                                filtersIcon.setImageResource(R.drawable.ic_filtr_pasivni);
+                                super.onAnimationEnd(animation);
+                            }
+
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                                view.setClickable(false);
+                                super.onAnimationStart(animation);
+
+                            }
+                        })
+                        .start();
+                filtersEnabled = false;
 
             }
+
+        });
+
+        CheckBox timelapse_checkbox = root.findViewById(R.id.timelapse_checkbox);
+        timelapse_checkbox.setOnClickListener(view -> {
+            BaseApp.setTimeLapseEnabled(!BaseApp.isTimeLapseEnabled());
         });
 
         IndicatorSeekBar seekBar = root.findViewById(R.id.seekBar);
@@ -96,7 +139,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onSeeking(SeekParams seekParams) {
-                progressBarMoved = true;
+                //  progressBarMoved = true;
                 year = Integer.valueOf(seekParams.tickText);
             }
 
@@ -117,40 +160,19 @@ public class HomeFragment extends Fragment {
         seekBarMonths.setIndicatorTextFormat("${TICK_TEXT}");
         seekBarMonths.setOnSeekChangeListener(new OnSeekChangeListener() {
             private int month;
-            private int lastValue;
-            private boolean moved = false;
-            private boolean added;
 
             @Override
             public void onSeeking(SeekParams seekParams) {
-                progressBarMoved = true;
-                moved = false;
-                if (seekParams.progress > 85 && !seekParams.tickText.equals("12")) {
-                    added = true;
-                    moved = true;
-                }
-                if (seekParams.progress < -85 && !seekParams.tickText.equals("1")) {
-                    added = false;
-                    moved = true;
-                }
-//                month = convertMonthToInt(seekParams.tickText);
-                month = Integer.valueOf(seekParams.tickText);
+                month = convertMonthToInt(seekParams.tickText);
             }
 
             private int convertMonthToInt(String tickText) {
                 int month = 1;
-                if ("Leden".equals(tickText)) month = 1;
-                if ("Únor".equals(tickText)) month = 2;
-                if ("Březen".equals(tickText)) month = 3;
-                if ("Duben".equals(tickText)) month = 4;
-                if ("Květen".equals(tickText)) month = 5;
-                if ("Červen".equals(tickText)) month = 6;
-                if ("Červenec".equals(tickText)) month = 7;
-                if ("Srpen".equals(tickText)) month = 8;
-                if ("Zaří".equals(tickText)) month = 9;
-                if ("Říjen".equals(tickText)) month = 10;
-                if ("Listopad".equals(tickText)) month = 11;
-                if ("Prosinec".equals(tickText)) month = 12;
+                if ("1 kvartál".equals(tickText)) month = 3;
+                if ("2 kvartál".equals(tickText)) month = 6;
+                if ("3 kvartál".equals(tickText)) month = 9;
+                if ("4 kvartál".equals(tickText)) month = 12;
+
                 return month;
             }
 
@@ -161,82 +183,55 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
-                if (moved) {
-                    if (added) lastValue += 3;
-                    else lastValue -= 3;
-                    final String[] stringArray = getContext().getResources().getStringArray(R.array.months_v2);
-                    final String[] strings = Arrays.copyOfRange(stringArray, lastValue, lastValue + 6);
-
-                    seekBarMonths.customTickTexts(strings);
-
-
-                    if (added) seekBarMonths.setProgress(-20);
-                    else seekBarMonths.setProgress(20);
-                }
-
                 homeViewModel.setMonth(month);
 
             }
         });
 
-
-        Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Fragment myFragment = null;
-                if (getParentFragment() != null) {
-                    myFragment = (Fragment) getParentFragment().getChildFragmentManager().findFragmentById(R.id.nav_host_fragment);
-                }
-                if (myFragment != null && myFragment instanceof HomeFragment) {
-                    Log.e("Time elapsed", String.valueOf(timeElapsed));
-                    timeElapsed++;
-                    if (!progressBarMoved) handler.postDelayed(this, 1000);
-                }
-
-                if (!progressBarMoved && myFragment != null && timeElapsed == 30) {
-                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
-                    builder.setTitle("Tip");
-                    builder.setMessage("Zkuste pohnout časovou osou");
-                    builder.setCancelable(true);
-                    builder.setPositiveButton("Ok", (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                    });
-                    builder.show();
-                    progressBarMoved = true;
-                    handler.removeCallbacks(this);
-                }
-            }
-        };
-        handler.postDelayed(runnable, 1000);
-
         // R.id.map is a FrameLayout, not a Fragment
         getChildFragmentManager().beginTransaction().replace(R.id.map, homeViewModel.getMapFragment()).commit();
+
         CheckBox victims = root.findViewById(R.id.checkBoxVictims);
         CheckBox events = root.findViewById(R.id.checkBoxEvents);
         CheckBox places = root.findViewById(R.id.checkBoxPlaces);
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (((CheckBox) view).isChecked()) {
-                    ((CheckBox) view).setTextColor(getContext().getColor(R.color.iti_orange));
-                    ((CheckBox) view).setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.iti_orange));
-                } else {
-                    ((CheckBox) view).setTextColor(getContext().getColor(R.color.colorAccent));
-                    ((CheckBox) view).setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.colorAccent));
-                }
-                Boolean[] filters = new Boolean[3];
-                filters[0] = victims.isChecked();
-                filters[1] = events.isChecked();
-                filters[2] = places.isChecked();
-                homeViewModel.updateFilters(filters);
+
+        victims.setChecked(BaseApp.getFilters()[0]);
+        events.setChecked(BaseApp.getFilters()[1]);
+        places.setChecked(BaseApp.getFilters()[2]);
+
+        setCheckBox(victims);
+        setCheckBox(events);
+        setCheckBox(places);
+
+        View.OnClickListener listener = view -> {
+            if (((CheckBox) view).isChecked()) {
+                ((CheckBox) view).setTextColor(getContext().getColor(R.color.iti_orange));
+                ((CheckBox) view).setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.iti_orange));
+            } else {
+                ((CheckBox) view).setTextColor(getContext().getColor(R.color.colorAccent));
+                ((CheckBox) view).setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.colorAccent));
             }
+            Boolean[] filters = new Boolean[3];
+            filters[0] = victims.isChecked();
+            filters[1] = events.isChecked();
+            filters[2] = places.isChecked();
+            homeViewModel.updateFilters(filters);
         };
         victims.setOnClickListener(listener);
         events.setOnClickListener(listener);
         places.setOnClickListener(listener);
 
         return root;
+    }
+
+    private void setCheckBox(View view){
+        if (((CheckBox) view).isChecked()) {
+            ((CheckBox) view).setTextColor(getContext().getColor(R.color.iti_orange));
+            ((CheckBox) view).setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.iti_orange));
+        } else {
+            ((CheckBox) view).setTextColor(getContext().getColor(R.color.colorAccent));
+            ((CheckBox) view).setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.colorAccent));
+        }
     }
 
     @Override

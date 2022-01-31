@@ -4,14 +4,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.victims.Person;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Deprecated//("Zatím nebudeme používat realm")
 public class RealmVictimsRecyclerViewAdapter extends RealmRecyclerViewAdapter<Person, RealmVictimsRecyclerViewAdapter.MyViewHolder> {

@@ -1,42 +1,32 @@
 package cz.deepvision.iti.is.ui.dialog;
 
+import static cz.deepvision.iti.is.util.LayoutGenerator.addInfo;
+import static cz.deepvision.iti.is.util.LayoutGenerator.addTransportInfo;
+import static cz.deepvision.iti.is.util.LayoutGenerator.filterEvents;
+import static cz.deepvision.iti.is.util.LayoutGenerator.getEndingChar;
+import static cz.deepvision.iti.is.util.LayoutGenerator.getTransports;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Bundle;
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.transition.Slide;
-import androidx.transition.Transition;
 
-import cz.deepvision.iti.is.OnLoadMoreListener;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.victims.Event;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
-import cz.deepvision.iti.is.ui.victims.VictimsViewModel;
 import cz.deepvision.iti.is.util.Requester;
-
-import java.util.List;
-
-import static cz.deepvision.iti.is.util.LayoutGenerator.*;
 
 public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater<Person> {
     private Person data;
@@ -79,6 +69,8 @@ public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater
     private void updateUI() {
         if (data != null) {
             name.setText(data.getName());
+            if (name.getText().toString().isEmpty())
+                name.setVisibility(View.GONE);
             String imageUrl = "";
             if (isSmallDialog()) {
                 firstIcon.setOnClickListener(icon -> {
@@ -115,6 +107,12 @@ public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater
                         });
                     });
                 }
+                String finalImageUrl = imageUrl;
+                photo.setOnClickListener(view -> {
+                    BigImageDialog bigImageDialog = new BigImageDialog(fragment, finalImageUrl);
+                    bigImageDialog.show(fragment.getActivity().getSupportFragmentManager(), "dialog_fullscreen");
+                });
+
             }
             secondIcon.setOnClickListener(v -> {
                 if (data.getLocation() != null) updateDataOnMap(data.getLocation());
@@ -128,34 +126,39 @@ public class VictimDialog extends DefaultDialog implements DefaultDialog.Updater
             if (!imageUrl.equals("")) {
                 Requester requester = new Requester(getActivity(), this);
                 requester.makeRequest(imageUrl);
-            } else photo.setImageDrawable(ctx.getDrawable(R.drawable.no_portrait_icon));
+            } else photo.setImageDrawable(ctx.getDrawable(R.drawable.ic_baseline_person));
 
 
-            addInfo(infoContainer, getEndingChar("Narozen", data) + " " + data.getBorn());
-            Event addressDeport = filterEvents("residence_before_deportation", data.getEventList());
-            if (addressDeport != null) if (addressDeport.getPlace() != null)
-                addInfo(infoContainer, "Poslední bydliště před deportací" + ": " + addressDeport.getPlace());
+            addInfo(infoContainer, getEndingChar("Narozen", data) + " " + data.getBorn() + "\n");
+
+            Event addressProt = filterEvents("residence_registration", data.getEventList());
+            if (addressProt != null) if (addressProt.getPlace() != null)
+                addInfo(infoContainer, "Adresa registrace v protektorátu" + ": " + addressProt.getPlace() + "\n");
 
             if (!isSmallDialog()) {
-                Event addressProt = filterEvents("residence_before_deportation", data.getEventList());
-                if (addressProt != null) if (addressProt.getPlace() != null)
-                    addInfo(infoContainer, "Adresa registrace v protektorátu" + ": " + addressProt.getPlace());
-                String fate = data.getFate().equals("murdered") ? "Zavražděn" : "Přežil";
-                String deathPlace = data.getDeathPlace() != null ? data.getDeathPlace() : "";
-                String sexFate = getEndingChar(fate, data);
-                addInfo(infoContainer, sexFate + " " + deathPlace);
-            } else {
-                String fate = data.getFate().equals("murdered") ? "Zavražděn" : "Přežil";
-                addInfo(infoContainer, getEndingChar(fate, data));
+                Event addressDeport = filterEvents("residence_before_deportation", data.getEventList());
+                if (addressDeport != null) if (addressDeport.getPlace() != null)
+                    addInfo(infoContainer, "Poslední bydliště před deportací" + ": " + addressDeport.getPlace() + "\n");
             }
 
             List<Event> transports = getTransports(data.getEventList());
-            for (Event transport : transports) {
-                if (transport.getName() != null) {
-                    String[] parts = transport.getName().split("\\(");
-                    addInfo(infoContainer, "Transport " + parts[0] + ",č. " + transport.getTransport_nm() + "(" + parts[1]);
+
+            List<Event> collect = transports.stream().sorted(Comparator.comparingInt(event -> Integer.parseInt(event.getTransport_nm()))).collect(Collectors.toList());
+            for (int i = 0; i < collect.size(); i++) {
+                if (collect.get(i).getName() != null) {
+                    String[] parts = collect.get(i).getName().split("\\(");
+                    addTransportInfo(infoContainer, "Transport " + parts[0] + ",č. " + collect.get(i).getTransport_nm() + "(" + parts[1], i == collect.size() - 1);
                 }
             }
+            String fate = data.getFate().equals("murdered") ? "Zavražděn" : "Přežil";
+            String deathPlace = data.getDeathPlace() != null ? data.getDeathPlace() : "";
+            String sexFate = getEndingChar(fate, data);
+
+
+            if (isSmallDialog())
+                addInfo(infoContainer, getEndingChar(fate, data));
+            else
+                addInfo(infoContainer, sexFate + " - " + deathPlace);
         }
     }
 

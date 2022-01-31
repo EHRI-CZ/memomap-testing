@@ -12,9 +12,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_gps_off"
+        android:src="@drawable/ic_poloha_pasivni"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/filters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_filtr_pasivni"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gps_provider" />
+
 
     <FrameLayout
         android:id="@+id/map"
@@ -23,9 +34,25 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         tools:context=".ui.home.HomeFragment" />
+
+    <CheckBox
+        android:id="@+id/timelapse_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:buttonTint="@color/iti_orange"
+        android:minHeight="48dp"
+        android:text="Zapnout časovou osu"
+        android:textColor="@color/iti_orange_faded"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.warkiz.widget.IndicatorSeekBar
         android:id="@+id/seekBar"
@@ -34,9 +61,8 @@
         android:background="@color/black"
         app:isb_indicator_text_size="18sp"
         app:isb_max="100"
-        app:isb_min="-100"
+        app:isb_min="0"
         app:isb_only_thumb_draggable="false"
-        app:isb_progress="0"
         app:isb_seek_smoothly="true"
         app:isb_show_indicator="rounded_rectangle"
         app:isb_show_tick_marks_type="oval"
@@ -49,7 +75,7 @@
         app:isb_tick_texts_color="@color/white"
         app:isb_tick_texts_size="15sp"
         app:isb_ticks_count="7"
-        app:isb_track_background_color="@color/white"
+        app:isb_track_background_color="@color/iti_orange"
         app:isb_track_background_size="2dp"
         app:isb_track_progress_color="@color/iti_orange"
         app:isb_track_progress_size="4dp"
@@ -65,7 +91,7 @@
         android:background="@color/black"
         app:isb_indicator_text_size="18sp"
         app:isb_max="100"
-        app:isb_min="-100"
+        app:isb_min="0"
         app:isb_only_thumb_draggable="false"
         app:isb_progress="0"
         app:isb_seek_smoothly="true"
@@ -79,29 +105,30 @@
         app:isb_tick_texts_array="@array/months_v2"
         app:isb_tick_texts_color="@color/white"
         app:isb_tick_texts_size="11sp"
-        app:isb_ticks_count="6"
-        app:isb_track_background_color="@color/white"
+        app:isb_ticks_count="4"
+        app:isb_track_background_color="@color/iti_orange"
         app:isb_track_background_size="2dp"
         app:isb_track_progress_color="@color/iti_orange"
         app:isb_track_progress_size="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/check_group"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/check_group"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginTop="8dp"
+        android:background="@drawable/background_lefradius"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filters">
 
         <CheckBox
             android:id="@+id/checkBoxVictims"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:buttonTint="@color/iti_orange"
             android:checked="true"
@@ -111,7 +138,7 @@
         <CheckBox
             android:id="@+id/checkBoxEvents"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:buttonTint="@color/iti_orange"
             android:checked="true"
@@ -121,7 +148,7 @@
         <CheckBox
             android:id="@+id/checkBoxPlaces"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:buttonTint="@color/iti_orange"
             android:checked="true"

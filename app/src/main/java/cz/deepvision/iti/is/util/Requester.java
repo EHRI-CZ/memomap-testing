@@ -5,11 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.widget.ImageView;
-
-import cz.deepvision.iti.is.ui.dialog.DefaultDialog;
-import okhttp3.*;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -18,6 +14,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import cz.deepvision.iti.is.ui.dialog.DefaultDialog;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class Requester {
     private Activity activity;

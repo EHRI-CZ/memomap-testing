@@ -3,7 +3,7 @@ query entitiesGeoListLimited($lon: Float!, $lat: Float!, $radius: Int!,$offset: 
         entity_label
         id
         location{lat,lon}
-       full
+        full
         preview
     }
 }

@@ -1,0 +1,31 @@
+query filterEntitiesEvents($lon: Float!, $lat: Float!, $radius: Int!){
+    filterEntitiesEvents(lon: $lon, lat: $lat, meters: $radius){
+        entities{
+            location{
+                lat,lon
+            }
+            groupCount,
+            ids,
+            labels
+            type
+        }
+        events{
+            location{
+                lat,lon
+            }
+            groupCount,
+            ids,
+            labels
+            type
+        }
+        places{
+            location{
+                lat,lon
+            }
+            groupCount,
+            ids,
+            labels
+            type
+        }
+    }
+}

@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-import java.util.Date;
 import java.util.List;
 
 public class CustomMarker<T> implements ClusterItem {
@@ -58,10 +57,6 @@ public class CustomMarker<T> implements ClusterItem {
 
     public boolean isVisible() {
         return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
     }
 
     @NonNull

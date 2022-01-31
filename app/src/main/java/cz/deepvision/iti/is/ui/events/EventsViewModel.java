@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.deepvision.iti.is.BaseApp;
 import cz.deepvision.iti.is.graphql.EventsGeoListLimitedQuery;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
 import cz.deepvision.iti.is.util.NetworkConnection;
@@ -45,7 +46,7 @@ public class EventsViewModel extends ViewModel {
     }
 
     public void loadData() {
-        LatLng location = new LatLng(50.0853034, 14.4276448);
+        LatLng location = BaseApp.getGpsLocation();
         int radius = 150;
         if (mOffset > 0) radius += radius;
 
@@ -57,7 +58,7 @@ public class EventsViewModel extends ViewModel {
                 if (response.data() != null) {
                     for (EventsGeoListLimitedQuery.EventsGeoListLimited dbItem : response.data().eventsGeoListLimited()) {
                         RecordListItem item = new RecordListItem();
-                        item.setLabel(number + ":" + dbItem.event_label());
+                        item.setLabel(dbItem.event_label());
                         item.setKey(dbItem.id());
                         item.setUrl(dbItem.preview());
                         items.add(item);

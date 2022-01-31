@@ -4,7 +4,7 @@
   "extensions": {
     "endpoints": {
       "Default GraphQL Endpoint": {
-        "url": "http://77.236.207.194:8529/_db/ITI_DV/iti",
+        "url": "http://77.236.207.194:8529/_db/ITI_2021/api3",
         "headers": {
           "user-agent": "JS GraphQL"
         },

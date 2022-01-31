@@ -1,0 +1,32 @@
+query filterAll($lon: Float!, $lat: Float!, $radius: Int!){
+    filterAll(lon: $lon, lat: $lat, meters: $radius){
+        entities{
+            location{
+                lat,lon
+            }
+            groupCount,
+            ids,
+            labels
+            type
+        }
+        events{
+            location{
+                lat,lon
+            }
+            groupCount,
+            ids,
+            labels
+            type
+        }
+        places{
+            location{
+                lat,lon
+            }
+            groupCount,
+            ids,
+            labels
+            type
+        }
+
+    }
+}

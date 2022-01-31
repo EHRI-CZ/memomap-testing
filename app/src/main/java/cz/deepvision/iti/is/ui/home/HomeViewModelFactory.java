@@ -1,9 +1,11 @@
 package cz.deepvision.iti.is.ui.home;
 
 import android.app.Application;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+
 import cz.deepvision.iti.is.models.Location;
 
 public class HomeViewModelFactory implements ViewModelProvider.Factory {

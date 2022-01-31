@@ -7,8 +7,16 @@ public class ListViewItem {
     private String type;
 
     public ListViewItem(String key, String label, String type) {
-        this.key = key;
+
         this.label = label;
+
+        if(type.equals("entity")){
+            String name = label.split("\\(")[0];
+            String[] birthDay = label.split("\\(")[1].split("\\)");
+            String customLabel = name + "\n" + birthDay[0];
+            this.label = customLabel;
+        }
+        this.key = key;
         this.type = type;
     }
 

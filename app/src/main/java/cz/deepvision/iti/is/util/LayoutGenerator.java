@@ -2,14 +2,19 @@ package cz.deepvision.iti.is.util;
 
 import android.content.Context;
 import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import cz.deepvision.iti.is.models.victims.Event;
-import cz.deepvision.iti.is.models.victims.Person;
-import io.realm.RealmList;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.deepvision.iti.is.R;
+import cz.deepvision.iti.is.models.victims.Event;
+import cz.deepvision.iti.is.models.victims.Person;
+import io.realm.RealmList;
 
 public class LayoutGenerator {
     private static Context ctx;
@@ -17,6 +22,11 @@ public class LayoutGenerator {
     public static void init(Context context) {
         ctx = context;
     }
+
+    private static Spanned getSpannedText(String text) {
+        return Html.fromHtml("<b>" + text + "</b>");
+    }
+
 
     public static void addInfo(LinearLayout infoContainer, String s) {
         TextView info = new TextView(ctx);
@@ -26,6 +36,21 @@ public class LayoutGenerator {
             info.setLineHeight(50);
         }
         infoContainer.addView(info);
+    }
+
+    public static void addTransportInfo(LinearLayout infoContainer, String s,boolean last) {
+        TextView info = new TextView(ctx);
+        info.setText(s);
+        info.setTextSize(12);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            info.setLineHeight(50);
+        }
+        infoContainer.addView(info);
+        if(!last){
+            ImageView imageView = new ImageView(ctx);
+            imageView.setImageDrawable(ctx.getDrawable(R.drawable.ic_action_name));
+            infoContainer.addView(imageView);
+        }
     }
 
     public static Event filterEvents(String type, RealmList<Event> eventRealmList) {

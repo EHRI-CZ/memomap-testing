@@ -1,8 +1,9 @@
 package cz.deepvision.iti.is.ui.dialog;
 
+import static cz.deepvision.iti.is.util.LayoutGenerator.addInfo;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +18,6 @@ import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.models.Place;
 import cz.deepvision.iti.is.ui.victims.DocumentAdapter;
 import cz.deepvision.iti.is.util.Requester;
-
-import static cz.deepvision.iti.is.util.LayoutGenerator.addInfo;
 
 public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<Place> {
     private Place data;
@@ -110,7 +109,7 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
                 Requester requester = new Requester(getActivity(), this);
                 requester.makeRequest(imageUrl);
             } else
-                photo.setImageDrawable(getActivity().getDrawable(R.drawable.ic_baseline_home_96));
+                photo.setImageDrawable(getActivity().getDrawable(R.drawable.ic_baseline_house));
 
 
         }

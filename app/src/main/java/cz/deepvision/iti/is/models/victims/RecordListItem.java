@@ -1,9 +1,12 @@
 package cz.deepvision.iti.is.models.victims;
 
+import cz.deepvision.iti.is.models.Location;
+
 public class RecordListItem {
 
     private String key;
     private String label;
+    private Location location;
     private String url;
 
     public String getKey() {
@@ -28,5 +31,13 @@ public class RecordListItem {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

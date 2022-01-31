@@ -52,8 +52,15 @@ public class Person extends RealmObject {
                             deathPlace += personEvent.getDate() != null ? personEvent.getDate() : "";
                             deathPlace = personEvent.getPlace() != null ? personEvent.getPlace() : "";
                         }
-                        else
+                        else{
+
+                            if(personEvent.getType().equals("transport")){
+                                boolean present = eventList.stream().anyMatch(event1 -> event1.getName().equals(personEvent.getName()));
+                                if(!present)
+                                    eventList.add(personEvent);
+                            }else
                             eventList.add(personEvent);
+                        }
                     }
                 }
             }
@@ -61,8 +68,8 @@ public class Person extends RealmObject {
                 preview = data.preview();
             if (data.full() != null)
                 full = data.full();
-            if (data.location() != null)
-                location = new Location(data.location().lat(), data.location().lon());
+//            if (data.location() != null)
+  //              location = new Location(data.location().lat(), data.location().lon());
 
             if (data.documents() != null) {
                 for (EntityDetailQuery.Document document : data.documents()) {

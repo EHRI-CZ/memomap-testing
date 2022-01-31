@@ -16,7 +16,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,20 +23,20 @@ import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
 import cz.deepvision.iti.is.OnLoadMoreListener;
 import cz.deepvision.iti.is.OnShowAnotherElement;
 import cz.deepvision.iti.is.R;
 import cz.deepvision.iti.is.graphql.EntityDetailQuery;
+import cz.deepvision.iti.is.models.Location;
 import cz.deepvision.iti.is.models.victims.Person;
 import cz.deepvision.iti.is.models.victims.RecordListItem;
 import cz.deepvision.iti.is.ui.dialog.VictimDialog;
 import cz.deepvision.iti.is.util.NetworkConnection;
 import cz.deepvision.iti.is.util.Requester;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.logging.ConsoleHandler;
 
 public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int VIEW_TYPE_ITEM = 0;
@@ -105,7 +104,7 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (holder instanceof ItemViewHolder) {
             RecordListItem item = items.get(position);
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-            itemViewHolder.setUpPersonData(item.getKey(), item.getUrl(), item.getLabel(), position);
+            itemViewHolder.setUpPersonData(item.getKey(), item.getUrl(), item.getLabel(), item.getLocation(), position);
         } else if (holder instanceof LoadingViewHolder) {
             LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
             loadingViewHolder.progressBar.setIndeterminate(true);
@@ -124,6 +123,7 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public Person data;
         private String url;
         private String key;
+        private Location location;
         private int position;
         private VictimDialog victimDialog;
 
@@ -142,7 +142,13 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             data = new Person(responseData);
 
                             victimDialog = new VictimDialog(fragment, data, false, 0);
-                            fragment.getActivity().runOnUiThread(() -> victimDialog.updateData(data));
+                            fragment.getActivity().runOnUiThread(() -> {
+                                data.setLocation(location);
+                                victimDialog.updateData(data);
+
+                            });
+
+
 
                             victimDialog.setOnShowAnotherElement(onShowAnotherElement);
                             victimDialog.show(fragment.getChildFragmentManager(), VictimDialog.class.getName());
@@ -169,43 +175,47 @@ public class VictimsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             @Override
             public void showNext() {
                 if (position + 1 < items.size())
-                    showAnotherElement(items.get(++position).getKey(),-1);
+                    showAnotherElement(items.get(++position).getKey(), -1);
+
             }
 
             @Override
             public void showPrevious() {
                 if (position - 1 >= 0)
-                    showAnotherElement(items.get(--position).getKey(),1);
+                    showAnotherElement(items.get(--position).getKey(), 1);
             }
         };
 
-        public void setUpPersonData(String key, String url, String label, int position) {
+        public void setUpPersonData(String key, String url, String label, Location location, int position) {
             this.key = key;
             this.url = url;
-            this.title.setText(label);
+            String name = label.split("\\(")[0];
+            String[] birthDay = label.split("\\(")[1].split("\\)");
+            this.title.setText(name + "\n" + birthDay[0]);
+            this.location = location;
             this.position = position;
             if (url != null) {
                 Requester requester = new Requester(fragment.getActivity());
                 requester.makeRequestForAdapter(url, icon);
-            } else icon.setImageDrawable(activity.getDrawable(R.drawable.no_portrait_icon));
+            } else icon.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_person));
         }
 
-        public void showAnotherElement(String key,int style) {
-
+        public void showAnotherElement(String key, int style) {
             NetworkConnection.getInstance().getApolloClient().query(new EntityDetailQuery(key)).enqueue(new ApolloCall.Callback<EntityDetailQuery.Data>() {
                 @Override
                 public void onResponse(@NotNull Response<EntityDetailQuery.Data> response) {
                     EntityDetailQuery.EntityDetail responseData = response.data().entityDetail();
                     data = new Person(responseData);
-                    VictimDialog dialog = new VictimDialog(fragment, data,style);
+                    VictimDialog dialog = new VictimDialog(fragment, data, style);
 
                     dialog.show(fragment.getChildFragmentManager(), VictimDialog.class.getName());
+
                     dialog.setOnShowAnotherElement(onShowAnotherElement);
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.postDelayed(() -> {
                         victimDialog.dismiss();
                         victimDialog = dialog;
-                    },500);
+                    }, 500);
                 }
 
                 @Override

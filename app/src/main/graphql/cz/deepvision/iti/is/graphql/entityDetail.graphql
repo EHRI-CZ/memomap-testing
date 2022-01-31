@@ -6,10 +6,6 @@ query entityDetail($id : String!){
         surname
         fate
         sex
-        location{
-            lat
-            lon
-        }
         events{
             type
             date

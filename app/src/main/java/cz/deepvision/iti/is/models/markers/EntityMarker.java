@@ -4,12 +4,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupWithTransportsQuery;
 import cz.deepvision.iti.is.graphql.EntitiesGeoLocationGroupWithTransportsQuery.Entity;
 
 
-public class EntityMarker  extends CustomMarker<Entity>
-{
+public class EntityMarker extends CustomMarker<Entity> {
     private final LatLng mPosition;
     private List<Entity> mEntity;
     private String mSnippet;
@@ -25,7 +23,7 @@ public class EntityMarker  extends CustomMarker<Entity>
 
 
     public EntityMarker(double lat, double lng, List<Entity> entityList, String snippet, int iconRes, boolean visible) {
-        super(lat,lng,entityList,snippet,iconRes,visible);
+        super(lat, lng, entityList, snippet, iconRes, visible);
         mPosition = new LatLng(lat, lng);
         mEntity = entityList;
         mSnippet = snippet;
@@ -48,19 +46,26 @@ public class EntityMarker  extends CustomMarker<Entity>
     }
 
     @Override
-    public String getTitle() { return getWholeTitle(getmEntity()); }
+    public String getTitle() {
+        return getWholeTitle(getmEntity());
+    }
 
     private String getWholeTitle(List<Entity> getmEntity) {
         String title = "";
-        for (Entity entity : getmEntity) {
-            title += " ";
-            title += entity.label();
+        if (getmEntity != null) {
+            for (Entity entity : getmEntity) {
+                title += " ";
+                title += entity.label();
+            }
         }
+
         return title;
     }
 
     @Override
-    public String getSnippet() { return mSnippet; }
+    public String getSnippet() {
+        return mSnippet;
+    }
 
     /**
      * Set the title of the marker
@@ -69,6 +74,7 @@ public class EntityMarker  extends CustomMarker<Entity>
 
     /**
      * Set the description of the marker
+     *
      * @param snippet string to be set as snippet
      */
     public void setSnippet(String snippet) {
