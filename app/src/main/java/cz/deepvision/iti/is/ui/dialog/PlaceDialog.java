@@ -70,6 +70,7 @@ public class PlaceDialog extends DefaultDialog implements DefaultDialog.Updater<
                     });
                 });
                 if (data.getPreview() != null) imageUrl = data.getPreview();
+                if(data.getDescription() != null)
                 addInfo(infoContainer, data.getDescription().substring(0, data.getDescription().length() / 2) + "...");
             } else {
                 if (data.getDocumentList().size() > 0) {

@@ -48,7 +48,7 @@ public class PlacesViewModel extends ViewModel {
 
     public void loadData() {
         LatLng location = BaseApp.getGpsLocation();
-        int radius = 150;
+        int radius = 300;
         if (mOffset > 0) radius += radius;
 
         NetworkConnection.getInstance().getApolloClient().query(new PlacesGeoListLimitedQuery(location.longitude, location.latitude, (int) radius, mOffset, 12))

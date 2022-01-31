@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "cz.deepvision.iti.is.test"
+        applicationId "cz.deepvision.iti.is"
         minSdkVersion 25
         targetSdkVersion 31
         versionCode 1
@@ -18,7 +18,9 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("../DEEPVISION_new")
+            // Zde je nutné vytvořit vlastní podpisové klíče
+
+            //storeFile file("../SING_KEYS")
             storePassword "spojil"
             keyAlias "key0"
             keyPassword "spojil"

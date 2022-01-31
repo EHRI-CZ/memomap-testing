@@ -48,7 +48,7 @@ public class VictimsViewModel extends ViewModel {
 
     public void loadData(){
         LatLng location = BaseApp.getGpsLocation();
-        int radius = 150;
+        int radius = 300;
         if(mOffset>0) radius += radius;
 
         // TODO : Zobrazení vícero osob, data takhle přijdou, takže chyba buď GRAPHQL, nebo ITI
